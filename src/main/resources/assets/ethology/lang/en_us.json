@@ -1,0 +1,13 @@
+{
+  "itemGroup.ethology": "Example Mod Tab",
+  "block.ethology.example_block": "Example Block",
+  "item.ethology.example_item": "Example Item",
+
+  "ethology.configuration.title": "Ethology Configs",
+  "ethology.configuration.section.ethology.common.toml": "Ethology Configs",
+  "ethology.configuration.section.ethology.common.toml.title": "Ethology Configs",
+  "ethology.configuration.items": "Item List",
+  "ethology.configuration.logDirtBlock": "Log Dirt Block",
+  "ethology.configuration.magicNumberIntroduction": "Magic Number Text",
+  "ethology.configuration.magicNumber": "Magic Number"
+}
