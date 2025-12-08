@@ -29,4 +29,13 @@ public class EthologyDatabase {
     public static void setScanned(boolean scanned) {
         isScanned = scanned;
     }
+
+    /**
+     * Clears all cached data.
+     * Should be called when the player disconnects to prevent cross-world data pollution.
+     */
+    public static void clear() {
+        DATABASE.clear();
+        isScanned = false;
+    }
 }

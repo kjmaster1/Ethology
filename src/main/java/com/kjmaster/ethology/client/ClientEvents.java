@@ -1,10 +1,7 @@
 package com.kjmaster.ethology.client;
 
 import com.kjmaster.ethology.Ethology;
-import com.kjmaster.ethology.core.EthologyScanner;
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.Level;
+import com.kjmaster.ethology.core.EthologyDatabase;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -14,25 +11,9 @@ import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 public class ClientEvents {
 
     @SubscribeEvent
-    public static void onPlayerLogin(ClientPlayerNetworkEvent.LoggingIn event) {
-        // We schedule the scan to run on the main thread after login is complete.
-        // We enqueue it to ensure the Level is fully ready.
-        Minecraft mc = Minecraft.getInstance();
-
-        mc.execute(() -> {
-            Level level = mc.level;
-
-            if (mc.hasSingleplayerServer()) {
-                MinecraftServer server = mc.getSingleplayerServer();
-                if (server != null) {
-                    // Use the Overworld from the internal server for analysis
-                    level = server.overworld();
-                }
-            }
-
-            if (level == null) return;
-
-            EthologyScanner.scanAll(level);
-        });
+    public static void onPlayerLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+        // Clear static state to prevent data persisting between worlds/servers.
+        EthologyDatabase.clear();
+        Ethology.LOGGER.debug("Ethology Database cleared on logout.");
     }
 }

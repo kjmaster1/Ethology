@@ -2,47 +2,51 @@ package com.kjmaster.ethology.core;
 
 import com.kjmaster.ethology.Ethology;
 import com.kjmaster.ethology.api.MobScopedInfo;
+import com.kjmaster.ethology.network.RequestScanPayload;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class EthologyScanner {
 
-    public static void scanAll(Level level) {
-        if (EthologyDatabase.isScanned()) return;
+    /**
+     * Triggers the analysis for a specific entity type.
+     * 1. Runs local analysis immediately (fast, partial data).
+     * 2. Requests server analysis (slow, full data).
+     */
+    public static void scanEntity(EntityType<?> type) {
+        Level level = Minecraft.getInstance().level;
+        if (level == null) return;
 
-        long startTime = System.currentTimeMillis();
-        Ethology.LOGGER.info("Starting Ethology Entity Scan...");
-
-        for (EntityType<?> type : BuiltInRegistries.ENTITY_TYPE) {
-            try {
-                // We attempt to create an instance of every entity.
-                // We wrap this in try-catch because some mods might have entities that crash
-                // if created in specific ways or without specific NBT.
-                Entity entity = type.create(level);
-
-                if (entity instanceof LivingEntity living) {
-                    // This triggers our GoalParser and BrainParser logic
-                    MobScopedInfo info = EntityAnalyzer.analyze(type, level);
-
-                    if (info != null && !info.getTraits().isEmpty()) {
-                        EthologyDatabase.register(type, info);
-                    }
-
-                    // Cleanup the dummy entity
-                    living.discard();
+        // 1. Local Analysis (Client Thread)
+        // Checks basic stats and class hierarchy.
+        try {
+            // We do a fresh analyze every time to ensure we get the latest data,
+            // or we could check EthologyDatabase.get(type) first if we implemented a timestamp.
+            // For now, re-analyzing ensures we try to get "Better" data if previous was partial.
+            Entity entity = type.create(level);
+            if (entity instanceof LivingEntity living) {
+                MobScopedInfo info = EntityAnalyzer.analyze(type, level);
+                if (info != null) {
+                    EthologyDatabase.register(type, info);
                 }
-            } catch (Exception e) {
-                // Log warning but continue scanning other mobs
-                Ethology.LOGGER.warn("Ethology failed to analyze entity: {}", BuiltInRegistries.ENTITY_TYPE.getKey(type));
+                living.discard();
             }
+        } catch (Exception e) {
+            Ethology.LOGGER.warn("Local analysis failed for {}", BuiltInRegistries.ENTITY_TYPE.getKey(type));
         }
 
-        EthologyDatabase.setScanned(true);
-        Ethology.LOGGER.info("Ethology Scan Complete. Analyzed {} entities in {}ms.",
-                EthologyDatabase.getAll().size(),
-                System.currentTimeMillis() - startTime);
+        // 2. Remote Analysis Request
+        if (Minecraft.getInstance().getConnection() != null) {
+            try {
+                PacketDistributor.sendToServer(new RequestScanPayload(BuiltInRegistries.ENTITY_TYPE.getKey(type)));
+            } catch (Exception e) {
+                Ethology.LOGGER.debug("Could not send scan request packet.");
+            }
+        }
     }
 }

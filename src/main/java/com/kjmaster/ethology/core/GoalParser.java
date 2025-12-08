@@ -7,6 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -19,9 +20,6 @@ public class GoalParser {
     public static void parse(LivingEntity entity, MobScopedInfo info) {
         if (!(entity instanceof Mob mob)) return;
 
-        // 1. Analyze Main Goals
-        // AT Access: public net.minecraft.world.entity.Mob goalSelector
-        // AT Access: public net.minecraft.world.entity.ai.goal.GoalSelector availableGoals
         Set<WrappedGoal> goals = mob.goalSelector.availableGoals;
 
         boolean hasWander = false;
@@ -29,24 +27,23 @@ public class GoalParser {
         for (WrappedGoal wrapped : goals) {
             Goal innerGoal = wrapped.getGoal();
 
-            // Check specific types first
             switch (innerGoal) {
                 case TemptGoal temptGoal -> parseTempt(temptGoal, info);
-                case AvoidEntityGoal avoidEntityGoal -> parseAvoid(avoidEntityGoal, info);
-                case BreedGoal ignored8 -> parseBreed(info);
-                case PanicGoal ignored7 -> parsePanic(info);
-                case FloatGoal ignored6 -> parseFloat(info);
-                case OpenDoorGoal ignored5 -> parseDoor(info);
-                case BreakDoorGoal ignored4 -> parseBreakDoor(info);
-                case EatBlockGoal ignored3 -> parseEatBlock(info);
-                case SwellGoal ignored2 -> parseExplode(info); // Creepers
-                case MeleeAttackGoal ignored1 -> parseMelee(info); // Zombies, Spiders
-                case RangedBowAttackGoal ignored -> parseRanged(info); // Skeletons
+                case AvoidEntityGoal<?> avoidEntityGoal -> parseAvoid(avoidEntityGoal, info);
+                case BreedGoal ignored -> parseBreed(info);
+                case PanicGoal ignored -> parsePanic(info);
+                case FloatGoal ignored -> parseFloat(info);
+                case OpenDoorGoal ignored -> parseDoor(info);
+                case BreakDoorGoal ignored -> parseBreakDoor(info);
+                case EatBlockGoal ignored -> parseEatBlock(info);
+                case SwellGoal ignored -> parseExplode(info);
+                case MeleeAttackGoal ignored -> parseMelee(info);
+                case RangedBowAttackGoal<?> ignored -> parseRanged(info);
+                // 1.21+ specific goals can be added here as needed
                 default -> {
                 }
             }
 
-            // Track generic wandering to ensure passive mobs get at least one trait
             if (innerGoal instanceof RandomStrollGoal || innerGoal instanceof WaterAvoidingRandomStrollGoal) {
                 hasWander = true;
             }
@@ -55,29 +52,21 @@ public class GoalParser {
                 info.addTrait(new MobTrait(new ItemStack(Items.TROPICAL_FISH), Component.literal("Swimmer"), Component.literal("Swims randomly in water.")));
                 hasWander = true;
             }
-            else if (innerGoal.getClass().getSimpleName().contains("Fly")) {
-                // Catch generic flying goals (Phantoms, Bats, Bees, Ghasts)
-                info.addTrait(new MobTrait(new ItemStack(Items.FEATHER), Component.literal("Flyer"), Component.literal("Can fly through the air.")));
-                hasWander = true;
-            }
+
             else if (innerGoal instanceof BreathAirGoal) {
-                // Dolphins, Axolotls
                 info.addTrait(new MobTrait(new ItemStack(Items.BUBBLE_CORAL), Component.literal("Amphibious"), Component.literal("Needs air to breathe.")));
             }
         }
 
-        // Add a generic "Wanderer" trait if they have no other interesting traits but do move around
         if (info.getTraits().isEmpty() && hasWander) {
             info.addTrait(new MobTrait(new ItemStack(Items.LEATHER_BOOTS), Component.literal("Wanderer"), Component.literal("Roams the world aimlessly.")));
         }
 
-        // 2. Analyze Targets
-        // AT Access: public net.minecraft.world.entity.Mob targetSelector
         Set<WrappedGoal> targets = mob.targetSelector.availableGoals;
         for (WrappedGoal wrapped : targets) {
             Goal innerGoal = wrapped.getGoal();
-            if (innerGoal instanceof NearestAttackableTargetGoal) {
-                parseTarget((NearestAttackableTargetGoal<?>) innerGoal, info);
+            if (innerGoal instanceof NearestAttackableTargetGoal<?> targetGoal) {
+                parseTarget(targetGoal, info);
             }
         }
     }
@@ -85,19 +74,15 @@ public class GoalParser {
     // --- Parsing Logic Methods ---
 
     private static void parseTempt(TemptGoal goal, MobScopedInfo info) {
-        // AT Access: public net.minecraft.world.entity.ai.goal.TemptGoal items
         Predicate<ItemStack> predicate = goal.items;
-
         if (predicate instanceof Ingredient ingredient && ingredient.getItems().length > 0) {
             info.addTrait(new MobTrait(ingredient.getItems()[0], Component.literal("Temptable"), Component.literal("Follows players holding this.")));
         } else {
-            // Fallback for Mobs that use Lambdas (Cows, Sheep, etc.)
             info.addTrait(new MobTrait(new ItemStack(Items.WHEAT), Component.literal("Temptable"), Component.literal("Follows players holding food.")));
         }
     }
 
     private static void parseAvoid(AvoidEntityGoal<?> goal, MobScopedInfo info) {
-        // AT Access: public net.minecraft.world.entity.ai.goal.AvoidEntityGoal avoidClass
         Class<?> scaredOf = goal.avoidClass;
         info.addTrait(new MobTrait(new ItemStack(Items.BARRIER), Component.literal("Fearful"), Component.literal("Flees from " + scaredOf.getSimpleName())));
     }
@@ -131,7 +116,6 @@ public class GoalParser {
     }
 
     private static void parseMelee(MobScopedInfo info) {
-        // Check if we already added a "Hostile" trait to avoid duplicates
         if (info.getTraits().stream().noneMatch(t -> t.title().getString().equals("Melee"))) {
             info.addTrait(new MobTrait(new ItemStack(Items.IRON_SWORD), Component.literal("Melee"), Component.literal("Attacks targets in close range.")));
         }
@@ -142,12 +126,12 @@ public class GoalParser {
     }
 
     private static void parseTarget(NearestAttackableTargetGoal<?> goal, MobScopedInfo info) {
-        // AT Access: public net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal targetType
         Class<?> targetClass = goal.targetType;
         String name = targetClass.getSimpleName();
 
-        // Filter common "Player" target to just be "Hostile"
-        if (name.equals("Player") || name.equals("ServerPlayer")) {
+        // Robust Check: Use Class.isAssignableFrom to safely detect Players
+        // This handles "ServerPlayer", "Player", "AbstractClientPlayer" correctly
+        if (Player.class.isAssignableFrom(targetClass)) {
             if (info.getTraits().stream().noneMatch(t -> t.title().getString().equals("Hostile"))) {
                 info.addTrait(new MobTrait(new ItemStack(Items.RED_DYE), Component.literal("Hostile"), Component.literal("Aggressive towards players.")));
             }
