@@ -1,7 +1,7 @@
 package com.kjmaster.ethology.core;
 
-import com.kjmaster.ethology.Config;
 import com.kjmaster.ethology.Ethology;
+import com.kjmaster.ethology.EthologyTags;
 import com.kjmaster.ethology.api.MobScopedInfo;
 import com.kjmaster.ethology.api.MobTrait;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -25,7 +25,9 @@ public class EntityAnalyzer {
 
     public static MobScopedInfo analyze(EntityType<?> type, Level level) {
         ResourceLocation key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
-        if (Config.DENY_LIST.get().contains(key.toString())) return null;
+
+        if (type.is(EthologyTags.NO_ANALYSIS)) return null;
+
         if (!type.canSummon()) return null;
 
         try {
