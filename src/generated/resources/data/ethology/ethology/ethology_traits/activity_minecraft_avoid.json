@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Keeping distance from threats.",
+  "icon": "minecraft:cactus",
+  "target": "minecraft:avoid",
+  "title": "Avoiding"
+}

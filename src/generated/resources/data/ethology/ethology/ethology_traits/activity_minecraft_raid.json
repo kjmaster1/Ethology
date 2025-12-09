@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Actively participating in a raid.",
+  "icon": "minecraft:crossbow",
+  "target": "minecraft:raid",
+  "title": "Raiding"
+}

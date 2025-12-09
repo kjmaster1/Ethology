@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Engaging in play with others.",
+  "icon": "minecraft:poppy",
+  "target": "minecraft:play",
+  "title": "Playing"
+}

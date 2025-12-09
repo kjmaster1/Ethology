@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
@@ -51,10 +52,38 @@ public class MobListWidget extends ObjectSelectionList<MobListWidget.MobEntry> {
                 });
     }
 
+    /**
+     * Filters out technical entities, projectiles, and non-living objects
+     * to ensure the list only contains analyzable Mobs.
+     */
     private boolean isLikelyMob(EntityType<?> type) {
-        // Filter out MISC (Projectiles, Items, etc.) to keep list clean
-        MobCategory category = type.getCategory();
-        return category != MobCategory.MISC;
+        // 1. Must be Summonable (filters out technical entities like Lightning, Fishing Bobbers, etc.)
+        if (!type.canSummon()) return false;
+
+        // 2. Category Filter (Filters out Items, Projectiles, etc.)
+        if (type.getCategory() == MobCategory.MISC) return false;
+
+        // 3. Must have Default Attributes (Health, etc.)
+        // This acts as a robust check for "Is this a Living Entity?".
+        // It filters out Boats, Minecarts, and Primed TNT which are not MISC but have no biology.
+        if (!DefaultAttributes.hasSupplier(type)) return false;
+
+        // 4. Specific Exclusions
+        // Armor Stands are technically LivingEntities with attributes, but we don't study their behavior.
+        if (type == EntityType.ARMOR_STAND) return false;
+        if (type == EntityType.GIANT) return false; // Vanilla Giants are non-functional and often have no AI.
+
+        return true;
+    }
+
+    public void setSelectedByType(EntityType<?> type) {
+        for (MobEntry entry : this.children()) {
+            if (entry.type == type) {
+                this.setSelected(entry);
+                this.ensureVisible(entry);
+                break;
+            }
+        }
     }
 
     public class MobEntry extends ObjectSelectionList.Entry<MobEntry> {

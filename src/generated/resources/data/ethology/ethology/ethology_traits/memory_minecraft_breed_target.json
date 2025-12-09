@@ -1,0 +1,7 @@
+{
+  "type": "memory",
+  "description": "Focusing on a partner.",
+  "icon": "minecraft:heart_of_the_sea",
+  "target": "minecraft:breed_target",
+  "title": "Mate"
+}

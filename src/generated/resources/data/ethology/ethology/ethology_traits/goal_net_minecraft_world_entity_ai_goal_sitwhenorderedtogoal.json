@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Sits when ordered.",
+  "icon": "minecraft:lead",
+  "target": "net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal",
+  "title": "Obedient"
+}

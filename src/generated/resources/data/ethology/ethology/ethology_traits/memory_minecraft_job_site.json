@@ -1,0 +1,7 @@
+{
+  "type": "memory",
+  "description": "Remembers workplace.",
+  "icon": "minecraft:emerald",
+  "target": "minecraft:job_site",
+  "title": "Job Site"
+}

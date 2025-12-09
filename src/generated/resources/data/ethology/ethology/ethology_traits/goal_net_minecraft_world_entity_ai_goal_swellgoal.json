@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Detonates near targets.",
+  "icon": "minecraft:tnt",
+  "target": "net.minecraft.world.entity.ai.goal.SwellGoal",
+  "title": "Explosive"
+}

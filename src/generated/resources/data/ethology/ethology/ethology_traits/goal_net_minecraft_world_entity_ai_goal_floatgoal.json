@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Floats in water.",
+  "icon": "minecraft:lily_pad",
+  "target": "net.minecraft.world.entity.ai.goal.FloatGoal",
+  "title": "Buoyant"
+}

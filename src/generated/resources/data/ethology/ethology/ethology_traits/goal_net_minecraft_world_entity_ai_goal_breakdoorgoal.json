@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Breaks down doors.",
+  "icon": "minecraft:iron_axe",
+  "target": "net.minecraft.world.entity.ai.goal.BreakDoorGoal",
+  "title": "Door Breaker"
+}

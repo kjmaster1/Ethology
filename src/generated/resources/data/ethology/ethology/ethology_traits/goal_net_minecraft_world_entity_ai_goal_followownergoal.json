@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Follows its owner.",
+  "icon": "minecraft:bone",
+  "target": "net.minecraft.world.entity.ai.goal.FollowOwnerGoal",
+  "title": "Loyal"
+}

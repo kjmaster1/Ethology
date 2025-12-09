@@ -1,0 +1,7 @@
+{
+  "type": "memory",
+  "description": "Likes a specific player.",
+  "icon": "minecraft:cookie",
+  "target": "minecraft:liked_player",
+  "title": "Friendship"
+}

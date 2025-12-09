@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Attacks targets in close range.",
+  "icon": "minecraft:iron_sword",
+  "target": "net.minecraft.world.entity.ai.goal.MeleeAttackGoal",
+  "title": "Melee"
+}

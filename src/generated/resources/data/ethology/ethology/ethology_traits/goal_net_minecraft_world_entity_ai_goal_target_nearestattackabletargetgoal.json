@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Hunts specific enemies.",
+  "icon": "minecraft:crossbow",
+  "target": "net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal",
+  "title": "Aggressive"
+}

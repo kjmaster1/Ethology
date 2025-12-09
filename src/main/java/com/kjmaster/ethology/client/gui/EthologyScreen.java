@@ -78,6 +78,26 @@ public class EthologyScreen extends Screen {
 
         this.layout.visitWidgets(this::addRenderableWidget);
         this.repositionElements();
+
+        // Check for crosshair target on open
+        Entity crosshairTarget = this.minecraft.crosshairPickEntity;
+        if (crosshairTarget instanceof LivingEntity living) {
+            // Trigger State-Aware Scan
+            EthologyScanner.scanTargetedEntity(living);
+
+            // Auto-select in list
+            this.listWidget.setSelectedByType(living.getType());
+
+            // Set cached entity to the actual instance for "True" preview
+            // Note: renderEntityInInventory might need a copy if the world entity moves too much,
+            // but for a paused screen or short viewing, using the instance directly is fine.
+            this.cachedEntity = living;
+
+            // Update info immediately with local data
+            this.infoWidget.updateInfo(EthologyDatabase.get(living.getType()));
+        }
+
+
     }
 
     @Override

@@ -1,0 +1,7 @@
+{
+  "type": "sensor",
+  "description": "Can locate beds.",
+  "icon": "minecraft:red_bed",
+  "target": "minecraft:nearest_bed",
+  "title": "Bed Sense"
+}

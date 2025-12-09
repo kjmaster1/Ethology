@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Avoids certain entities.",
+  "icon": "minecraft:barrier",
+  "target": "net.minecraft.world.entity.ai.goal.AvoidEntityGoal",
+  "title": "Fearful"
+}

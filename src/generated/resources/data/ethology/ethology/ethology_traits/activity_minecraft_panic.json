@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Fleeing from immediate danger.",
+  "icon": "minecraft:sugar",
+  "target": "minecraft:panic",
+  "title": "Panic"
+}

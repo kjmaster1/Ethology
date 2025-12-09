@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Digging into the ground.",
+  "icon": "minecraft:iron_shovel",
+  "target": "minecraft:dig",
+  "title": "Digging"
+}

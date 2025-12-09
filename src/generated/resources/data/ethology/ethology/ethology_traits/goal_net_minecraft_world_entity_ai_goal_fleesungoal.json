@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Burns in sunlight.",
+  "icon": "minecraft:rotten_flesh",
+  "target": "net.minecraft.world.entity.ai.goal.FleeSunGoal",
+  "title": "Photosensitive"
+}

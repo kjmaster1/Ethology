@@ -20,15 +20,31 @@ import net.minecraft.world.level.Level;
 
 public class EntityAnalyzer {
 
+    /**
+     * Archetype Analysis: Creates a fresh entity to guess "default" traits.
+     */
     public static MobScopedInfo analyze(EntityType<?> type, Level level) {
         Entity entity = type.create(level);
         if (!(entity instanceof LivingEntity living)) {
             return null;
         }
 
+        // Analyze the dummy entity
+        MobScopedInfo info = analyze(living);
+
+        // Cleanup
+        living.discard();
+        return info;
+    }
+
+    /**
+     * Instance Analysis: Analyzes a specific running entity instance.
+     */
+    public static MobScopedInfo analyze(LivingEntity living) {
+        EntityType<?> type = living.getType();
         MobScopedInfo info = new MobScopedInfo(BuiltInRegistries.ENTITY_TYPE.getKey(type));
 
-        // 1. Stats
+        // 1. Stats (Current values, not just base)
         extractStats(living, info);
 
         // 2. Logic Analysis
@@ -41,7 +57,6 @@ public class EntityAnalyzer {
         GoalParser.parse(living, info);
 
         // 3. Fallback Classification
-        // If specific AI analysis didn't find enough info, fallback to class hierarchy.
         applyFallbacks(living, info);
 
         return info;
@@ -62,9 +77,6 @@ public class EntityAnalyzer {
     }
 
     private static void applyFallbacks(LivingEntity entity, MobScopedInfo info) {
-        // If we already have a specific Hostile/Passive trait, we might skip generic ones,
-        // but adding "Aquatic" or "Flying" is always useful.
-
         // 1. Aquatic
         if ((entity instanceof WaterAnimal || entity.canBreatheUnderwater()) && !(entity instanceof ArmorStand)) {
             addUniqueTrait(info, new MobTrait(new ItemStack(Items.WATER_BUCKET), Component.literal("Aquatic"), Component.literal("Lives and swims in water.")));
@@ -76,13 +88,11 @@ public class EntityAnalyzer {
         }
 
         // 3. Hostility (Fallback)
-        // If we haven't detected specific attack goals but it implements Enemy (Monster)
         if (entity instanceof Enemy && info.getTraits().stream().noneMatch(t -> t.title().getString().equals("Hostile"))) {
             info.addTrait(new MobTrait(new ItemStack(Items.IRON_SWORD), Component.literal("Hostile"), Component.literal("Naturally aggressive monster.")));
         }
 
         // 4. Passive (Fallback)
-        // If it's an Animal/Ambient and NOT an Enemy, and we have no other traits
         if ((entity instanceof Animal || entity instanceof AmbientCreature) && !(entity instanceof Enemy)) {
             if (info.getTraits().isEmpty()) {
                 info.addTrait(new MobTrait(new ItemStack(Items.GRASS_BLOCK), Component.literal("Passive"), Component.literal("Harmless ambient creature.")));

@@ -1,0 +1,7 @@
+{
+  "type": "memory",
+  "description": "Remembers recent damage source.",
+  "icon": "minecraft:damaged_anvil",
+  "target": "minecraft:hurt_by",
+  "title": "Grudge"
+}

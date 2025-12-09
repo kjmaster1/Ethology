@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Swimming in water.",
+  "icon": "minecraft:water_bucket",
+  "target": "minecraft:swim",
+  "title": "Swimming"
+}

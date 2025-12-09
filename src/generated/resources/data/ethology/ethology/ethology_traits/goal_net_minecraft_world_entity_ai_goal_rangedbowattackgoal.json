@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Shoots arrows at targets.",
+  "icon": "minecraft:bow",
+  "target": "net.minecraft.world.entity.ai.goal.RangedBowAttackGoal",
+  "title": "Archer"
+}

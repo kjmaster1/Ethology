@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Roams randomly.",
+  "icon": "minecraft:leather_boots",
+  "target": "net.minecraft.world.entity.ai.goal.RandomStrollGoal",
+  "title": "Wanderer"
+}

@@ -1,0 +1,7 @@
+{
+  "type": "sensor",
+  "description": "Can detect nearby mobs.",
+  "icon": "minecraft:player_head",
+  "target": "minecraft:nearest_living_entities",
+  "title": "Mob Sense"
+}

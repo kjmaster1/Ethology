@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Attacks those who hurt it.",
+  "icon": "minecraft:iron_chestplate",
+  "target": "net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal",
+  "title": "Vengeful"
+}

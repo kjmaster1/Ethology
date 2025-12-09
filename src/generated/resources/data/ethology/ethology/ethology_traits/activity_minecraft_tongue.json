@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Using tongue to catch prey.",
+  "icon": "minecraft:slime_ball",
+  "target": "minecraft:tongue",
+  "title": "Tongue Attack"
+}

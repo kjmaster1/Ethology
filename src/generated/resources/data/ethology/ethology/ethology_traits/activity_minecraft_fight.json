@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Engaging in combat.",
+  "icon": "minecraft:netherite_sword",
+  "target": "minecraft:fight",
+  "title": "Fighting"
+}

@@ -1,0 +1,7 @@
+{
+  "type": "sensor",
+  "description": "Senses piglins and repellents.",
+  "icon": "minecraft:crimson_fungus",
+  "target": "minecraft:hoglin_specific_sensor",
+  "title": "Hoglin Logic"
+}

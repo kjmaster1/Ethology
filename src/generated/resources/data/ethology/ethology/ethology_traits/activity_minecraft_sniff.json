@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Searching for scents.",
+  "icon": "minecraft:moss_block",
+  "target": "minecraft:sniff",
+  "title": "Sniffing"
+}

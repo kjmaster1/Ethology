@@ -1,0 +1,7 @@
+{
+  "type": "sensor",
+  "description": "Detects vibrations.",
+  "icon": "minecraft:sculk_sensor",
+  "target": "minecraft:warden_entity_sensor",
+  "title": "Vibration Sense"
+}

@@ -1,0 +1,7 @@
+{
+  "type": "sensor",
+  "description": "Knows if it is in water.",
+  "icon": "minecraft:water_bucket",
+  "target": "minecraft:is_in_water",
+  "title": "Hydro Sense"
+}

@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Performing a profession task.",
+  "icon": "minecraft:crafting_table",
+  "target": "minecraft:work",
+  "title": "Working"
+}

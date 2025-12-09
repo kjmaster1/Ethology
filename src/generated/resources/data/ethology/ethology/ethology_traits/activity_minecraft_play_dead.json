@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Pretending to be dead.",
+  "icon": "minecraft:bone",
+  "target": "minecraft:play_dead",
+  "title": "Playing Dead"
+}

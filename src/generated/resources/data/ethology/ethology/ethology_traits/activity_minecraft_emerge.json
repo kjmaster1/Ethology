@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Digging out of the ground.",
+  "icon": "minecraft:dirt",
+  "target": "minecraft:emerge",
+  "title": "Emerging"
+}

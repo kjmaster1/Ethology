@@ -11,42 +11,48 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.Optional;
+
 public class EthologyScanner {
 
-    /**
-     * Triggers the analysis for a specific entity type.
-     * 1. Runs local analysis immediately (fast, partial data).
-     * 2. Requests server analysis (slow, full data).
-     */
+    // Existing archetype scan
     public static void scanEntity(EntityType<?> type) {
         Level level = Minecraft.getInstance().level;
         if (level == null) return;
 
-        // 1. Local Analysis (Client Thread)
-        // Checks basic stats and class hierarchy.
+        // Local Guess
         try {
-            // We do a fresh analyze every time to ensure we get the latest data,
-            // or we could check EthologyDatabase.get(type) first if we implemented a timestamp.
-            // For now, re-analyzing ensures we try to get "Better" data if previous was partial.
             Entity entity = type.create(level);
             if (entity instanceof LivingEntity living) {
                 MobScopedInfo info = EntityAnalyzer.analyze(type, level);
-                if (info != null) {
-                    EthologyDatabase.register(type, info);
-                }
+                if (info != null) EthologyDatabase.register(type, info);
                 living.discard();
             }
         } catch (Exception e) {
             Ethology.LOGGER.warn("Local analysis failed for {}", BuiltInRegistries.ENTITY_TYPE.getKey(type));
         }
 
-        // 2. Remote Analysis Request
+        // Remote Request (Archetype, no UUID)
         if (Minecraft.getInstance().getConnection() != null) {
-            try {
-                PacketDistributor.sendToServer(new RequestScanPayload(BuiltInRegistries.ENTITY_TYPE.getKey(type)));
-            } catch (Exception e) {
-                Ethology.LOGGER.debug("Could not send scan request packet.");
-            }
+            PacketDistributor.sendToServer(new RequestScanPayload(BuiltInRegistries.ENTITY_TYPE.getKey(type), Optional.empty()));
         }
+    }
+
+    // New Targeted Scan
+    public static void scanTargetedEntity(LivingEntity target) {
+        if (Minecraft.getInstance().getConnection() == null) return;
+
+        EntityType<?> type = target.getType();
+
+        // 1. Run local analysis immediately on the client instance (gets visible data like Health/Armor)
+        try {
+            MobScopedInfo info = EntityAnalyzer.analyze(target);
+            EthologyDatabase.register(type, info);
+        } catch (Exception e) {
+            Ethology.LOGGER.warn("Local targeted analysis failed", e);
+        }
+
+        // 2. Request deep analysis from Server (gets Brain/Goals)
+        PacketDistributor.sendToServer(new RequestScanPayload(BuiltInRegistries.ENTITY_TYPE.getKey(type), Optional.of(target.getUUID())));
     }
 }

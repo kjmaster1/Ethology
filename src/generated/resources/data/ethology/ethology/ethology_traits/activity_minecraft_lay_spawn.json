@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Laying eggs or spawning offspring.",
+  "icon": "minecraft:turtle_egg",
+  "target": "minecraft:lay_spawn",
+  "title": "Laying Spawn"
+}

@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Can produce offspring.",
+  "icon": "minecraft:egg",
+  "target": "net.minecraft.world.entity.ai.goal.BreedGoal",
+  "title": "Breedable"
+}

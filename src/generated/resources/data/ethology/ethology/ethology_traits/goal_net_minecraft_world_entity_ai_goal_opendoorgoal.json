@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Can open doors.",
+  "icon": "minecraft:oak_door",
+  "target": "net.minecraft.world.entity.ai.goal.OpenDoorGoal",
+  "title": "Door User"
+}

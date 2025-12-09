@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Roams without entering water.",
+  "icon": "minecraft:leather_boots",
+  "target": "net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal",
+  "title": "Land Wanderer"
+}

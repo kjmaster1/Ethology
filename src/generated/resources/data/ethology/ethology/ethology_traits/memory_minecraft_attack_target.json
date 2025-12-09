@@ -1,0 +1,7 @@
+{
+  "type": "memory",
+  "description": "Focusing on an enemy.",
+  "icon": "minecraft:diamond_sword",
+  "target": "minecraft:attack_target",
+  "title": "Target"
+}

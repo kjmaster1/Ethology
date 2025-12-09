@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Defends the village.",
+  "icon": "minecraft:shield",
+  "target": "net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal",
+  "title": "Guardian"
+}

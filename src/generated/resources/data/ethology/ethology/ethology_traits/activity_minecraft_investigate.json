@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Checking out a disturbance.",
+  "icon": "minecraft:spyglass",
+  "target": "minecraft:investigate",
+  "title": "Investigating"
+}

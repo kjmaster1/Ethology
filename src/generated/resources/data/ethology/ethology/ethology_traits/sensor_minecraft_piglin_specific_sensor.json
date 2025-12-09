@@ -1,0 +1,7 @@
+{
+  "type": "sensor",
+  "description": "Senses gold and hoglins.",
+  "icon": "minecraft:gold_ingot",
+  "target": "minecraft:piglin_specific_sensor",
+  "title": "Piglin Logic"
+}

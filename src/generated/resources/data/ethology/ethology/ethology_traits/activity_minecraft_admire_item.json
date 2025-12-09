@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Distracted by a loved item.",
+  "icon": "minecraft:gold_ingot",
+  "target": "minecraft:admire_item",
+  "title": "Admiring"
+}

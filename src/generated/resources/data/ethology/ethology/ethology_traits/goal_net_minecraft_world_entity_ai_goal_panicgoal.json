@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Runs away when hurt.",
+  "icon": "minecraft:sugar",
+  "target": "net.minecraft.world.entity.ai.goal.PanicGoal",
+  "title": "Skittish"
+}

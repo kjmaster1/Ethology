@@ -1,0 +1,7 @@
+{
+  "type": "memory",
+  "description": "Moving towards a specific spot.",
+  "icon": "minecraft:compass",
+  "target": "minecraft:walk_target",
+  "title": "Destination"
+}

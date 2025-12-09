@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Waiting for something to happen.",
+  "icon": "minecraft:clock",
+  "target": "minecraft:idle",
+  "title": "Idle"
+}

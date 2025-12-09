@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Follows players holding food.",
+  "icon": "minecraft:wheat",
+  "target": "net.minecraft.world.entity.ai.goal.TemptGoal",
+  "title": "Temptable"
+}

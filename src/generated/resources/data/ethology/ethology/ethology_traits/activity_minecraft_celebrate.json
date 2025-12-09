@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Celebrating a victory.",
+  "icon": "minecraft:firework_rocket",
+  "target": "minecraft:celebrate",
+  "title": "Celebrating"
+}

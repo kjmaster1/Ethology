@@ -1,0 +1,7 @@
+{
+  "type": "activity",
+  "description": "Emitting a loud roar.",
+  "icon": "minecraft:sculk_shrieker",
+  "target": "minecraft:roar",
+  "title": "Roaring"
+}

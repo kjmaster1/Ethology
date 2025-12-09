@@ -1,0 +1,7 @@
+{
+  "type": "goal",
+  "description": "Watches nearby players.",
+  "icon": "minecraft:ender_eye",
+  "target": "net.minecraft.world.entity.ai.goal.LookAtPlayerGoal",
+  "title": "Watchful"
+}
