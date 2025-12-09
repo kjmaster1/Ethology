@@ -1,9 +1,12 @@
 package com.kjmaster.ethology.core;
 
+import com.kjmaster.ethology.Config;
+import com.kjmaster.ethology.Ethology;
 import com.kjmaster.ethology.api.MobScopedInfo;
 import com.kjmaster.ethology.api.MobTrait;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,17 +27,38 @@ public class EntityAnalyzer {
      * Archetype Analysis: Creates a fresh entity to guess "default" traits.
      */
     public static MobScopedInfo analyze(EntityType<?> type, Level level) {
-        Entity entity = type.create(level);
-        if (!(entity instanceof LivingEntity living)) {
+        ResourceLocation key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
+
+        // 1. Check Config Deny List
+        if (Config.DENY_LIST.get().contains(key.toString())) {
             return null;
         }
 
-        // Analyze the dummy entity
-        MobScopedInfo info = analyze(living);
+        // 2. Check if Summonable (Basic safety)
+        if (!type.canSummon()) {
+            return null;
+        }
 
-        // Cleanup
-        living.discard();
-        return info;
+        try {
+            Entity entity = type.create(level);
+
+            if (!(entity instanceof LivingEntity living)) {
+                if (entity != null) entity.discard(); // Ensure non-living entities are cleaned up
+                return null;
+            }
+
+            // Analyze the dummy entity
+            MobScopedInfo info = analyze(living);
+
+            // Cleanup
+            living.discard();
+            return info;
+
+        } catch (Exception e) {
+            // Log the error but prevent the crash
+            Ethology.LOGGER.warn("Failed to instantiate entity archetype for analysis: {}", key, e);
+            return null;
+        }
     }
 
     /**
