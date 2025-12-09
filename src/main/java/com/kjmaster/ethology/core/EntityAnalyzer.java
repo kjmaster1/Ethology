@@ -23,39 +23,21 @@ import net.minecraft.world.level.Level;
 
 public class EntityAnalyzer {
 
-    /**
-     * Archetype Analysis: Creates a fresh entity to guess "default" traits.
-     */
     public static MobScopedInfo analyze(EntityType<?> type, Level level) {
         ResourceLocation key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
-
-        // 1. Check Config Deny List
-        if (Config.DENY_LIST.get().contains(key.toString())) {
-            return null;
-        }
-
-        // 2. Check if Summonable (Basic safety)
-        if (!type.canSummon()) {
-            return null;
-        }
+        if (Config.DENY_LIST.get().contains(key.toString())) return null;
+        if (!type.canSummon()) return null;
 
         try {
             Entity entity = type.create(level);
-
             if (!(entity instanceof LivingEntity living)) {
-                if (entity != null) entity.discard(); // Ensure non-living entities are cleaned up
+                if (entity != null) entity.discard();
                 return null;
             }
-
-            // Analyze the dummy entity
             MobScopedInfo info = analyze(living);
-
-            // Cleanup
             living.discard();
             return info;
-
         } catch (Exception e) {
-            // Log the error but prevent the crash
             Ethology.LOGGER.warn("Failed to instantiate entity archetype for analysis: {}", key, e);
             return null;
         }
@@ -67,6 +49,9 @@ public class EntityAnalyzer {
     public static MobScopedInfo analyze(LivingEntity living) {
         EntityType<?> type = living.getType();
         MobScopedInfo info = new MobScopedInfo(BuiltInRegistries.ENTITY_TYPE.getKey(type));
+
+        // Set UUID for caching
+        info.setUuid(living.getUUID());
 
         // 1. Stats (Current values, not just base)
         extractStats(living, info);
@@ -89,34 +74,24 @@ public class EntityAnalyzer {
     private static void extractStats(LivingEntity entity, MobScopedInfo info) {
         if (entity.getAttributes().hasAttribute(Attributes.MAX_HEALTH))
             info.setMaxHealth(entity.getAttributeValue(Attributes.MAX_HEALTH));
-
         if (entity.getAttributes().hasAttribute(Attributes.ATTACK_DAMAGE))
             info.setAttackDamage(entity.getAttributeValue(Attributes.ATTACK_DAMAGE));
-
         if (entity.getAttributes().hasAttribute(Attributes.MOVEMENT_SPEED))
             info.setMovementSpeed(entity.getAttributeValue(Attributes.MOVEMENT_SPEED));
-
         if (entity.getAttributes().hasAttribute(Attributes.ARMOR))
             info.setArmor(entity.getAttributeValue(Attributes.ARMOR));
     }
 
     private static void applyFallbacks(LivingEntity entity, MobScopedInfo info) {
-        // 1. Aquatic
         if ((entity instanceof WaterAnimal || entity.canBreatheUnderwater()) && !(entity instanceof ArmorStand)) {
             addUniqueTrait(info, new MobTrait(new ItemStack(Items.WATER_BUCKET), Component.literal("Aquatic"), Component.literal("Lives and swims in water.")));
         }
-
-        // 2. Flying
         if (entity instanceof FlyingAnimal) {
             addUniqueTrait(info, new MobTrait(new ItemStack(Items.FEATHER), Component.literal("Aerial"), Component.literal("Capable of flight.")));
         }
-
-        // 3. Hostility (Fallback)
         if (entity instanceof Enemy && info.getTraits().stream().noneMatch(t -> t.title().getString().equals("Hostile"))) {
             info.addTrait(new MobTrait(new ItemStack(Items.IRON_SWORD), Component.literal("Hostile"), Component.literal("Naturally aggressive monster.")));
         }
-
-        // 4. Passive (Fallback)
         if ((entity instanceof Animal || entity instanceof AmbientCreature) && !(entity instanceof Enemy)) {
             if (info.getTraits().isEmpty()) {
                 info.addTrait(new MobTrait(new ItemStack(Items.GRASS_BLOCK), Component.literal("Passive"), Component.literal("Harmless ambient creature.")));
