@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Defends the village.",
   "icon": "minecraft:shield",
   "target": "net.minecraft.world.entity.ai.goal.target.DefendVillageTargetGoal",
-  "title": "Guardian"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_target_defendvillagetargetgoal"
 }

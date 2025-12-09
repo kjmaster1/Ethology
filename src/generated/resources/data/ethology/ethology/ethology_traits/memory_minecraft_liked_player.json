@@ -1,7 +1,6 @@
 {
   "type": "memory",
-  "description": "Likes a specific player.",
   "icon": "minecraft:cookie",
   "target": "minecraft:liked_player",
-  "title": "Friendship"
+  "translation_key": "ethology.trait.memory.minecraft_liked_player"
 }

@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Sits when ordered.",
   "icon": "minecraft:lead",
   "target": "net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal",
-  "title": "Obedient"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_sitwhenorderedtogoal"
 }

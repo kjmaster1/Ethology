@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Distracted by a loved item.",
   "icon": "minecraft:gold_ingot",
   "target": "minecraft:admire_item",
-  "title": "Admiring"
+  "translation_key": "ethology.trait.activity.minecraft_admire_item"
 }

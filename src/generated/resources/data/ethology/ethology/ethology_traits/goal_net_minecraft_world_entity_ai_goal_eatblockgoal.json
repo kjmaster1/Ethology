@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Eats grass to regain health.",
   "icon": "minecraft:grass_block",
   "target": "net.minecraft.world.entity.ai.goal.EatBlockGoal",
-  "title": "Grazer"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_eatblockgoal"
 }

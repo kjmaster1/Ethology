@@ -1,7 +1,6 @@
 {
   "type": "sensor",
-  "description": "Detects zombies and raiders.",
   "icon": "minecraft:zombie_head",
   "target": "minecraft:villager_hostiles",
-  "title": "Threat Sense"
+  "translation_key": "ethology.trait.sensor.minecraft_villager_hostiles"
 }

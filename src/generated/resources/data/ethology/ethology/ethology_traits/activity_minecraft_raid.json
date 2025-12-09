@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Actively participating in a raid.",
   "icon": "minecraft:crossbow",
   "target": "minecraft:raid",
-  "title": "Raiding"
+  "translation_key": "ethology.trait.activity.minecraft_raid"
 }

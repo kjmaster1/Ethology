@@ -1,7 +1,6 @@
 {
   "type": "sensor",
-  "description": "Can detect nearby players.",
   "icon": "minecraft:player_head",
   "target": "minecraft:nearest_players",
-  "title": "Player Sense"
+  "translation_key": "ethology.trait.sensor.minecraft_nearest_players"
 }

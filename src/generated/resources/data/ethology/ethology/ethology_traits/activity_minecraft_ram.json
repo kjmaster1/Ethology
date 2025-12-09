@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Charging at a target.",
   "icon": "minecraft:goat_horn",
   "target": "minecraft:ram",
-  "title": "Ramming"
+  "translation_key": "ethology.trait.activity.minecraft_ram"
 }

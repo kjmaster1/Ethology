@@ -1,6 +1,7 @@
 package com.kjmaster.ethology.api;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
@@ -11,8 +12,11 @@ import java.util.UUID;
 public class MobScopedInfo {
 
     private final ResourceLocation entityId;
-    private final List<MobTrait> traits = new ArrayList<>();
-    // Added UUID to track specific instances
+
+    // Split traits into capabilities and states
+    private final List<MobTrait> capabilities = new ArrayList<>();
+    private final List<MobTrait> currentStates = new ArrayList<>();
+
     private UUID uuid;
 
     private double maxHealth;
@@ -20,6 +24,7 @@ public class MobScopedInfo {
     private double movementSpeed;
     private double armor;
 
+    // StreamCodec definition for networking
     public static final StreamCodec<RegistryFriendlyByteBuf, MobScopedInfo> STREAM_CODEC = StreamCodec.of(
             MobScopedInfo::write,
             MobScopedInfo::read
@@ -29,11 +34,28 @@ public class MobScopedInfo {
         this.entityId = entityId;
     }
 
-    public List<MobTrait> getTraits() { return traits; }
-    public void addTrait(MobTrait mobTrait) { traits.add(mobTrait); }
     public ResourceLocation getEntityId() { return entityId; }
 
-    // UUID Getters/Setters
+    // --- Capabilities & States ---
+    public List<MobTrait> getCapabilities() { return capabilities; }
+    public void addCapability(MobTrait trait) {
+        if (!hasCapability(trait)) this.capabilities.add(trait);
+    }
+
+    public List<MobTrait> getCurrentStates() { return currentStates; }
+    public void addCurrentState(MobTrait trait) {
+        if (!hasState(trait)) this.currentStates.add(trait);
+    }
+
+    private boolean hasCapability(MobTrait trait) {
+        return capabilities.stream().anyMatch(t -> t.id().equals(trait.id()));
+    }
+
+    private boolean hasState(MobTrait trait) {
+        return currentStates.stream().anyMatch(t -> t.id().equals(trait.id()));
+    }
+
+    // --- Stats & UUID ---
     public UUID getUuid() { return uuid; }
     public void setUuid(UUID uuid) { this.uuid = uuid; }
 
@@ -46,10 +68,12 @@ public class MobScopedInfo {
     public double getArmor() { return armor; }
     public void setArmor(double armor) { this.armor = armor; }
 
+    // --- Networking Logic ---
+
     public static void write(RegistryFriendlyByteBuf buffer, MobScopedInfo info) {
         buffer.writeResourceLocation(info.entityId);
 
-        // Write UUID (optional)
+        // UUID (Optional)
         buffer.writeBoolean(info.uuid != null);
         if (info.uuid != null) {
             buffer.writeUUID(info.uuid);
@@ -60,17 +84,17 @@ public class MobScopedInfo {
         buffer.writeDouble(info.movementSpeed);
         buffer.writeDouble(info.armor);
 
-        buffer.writeInt(info.traits.size());
-        for (MobTrait trait : info.traits) {
-            MobTrait.STREAM_CODEC.encode(buffer, trait);
-        }
+        // Write Capabilities List using the MobTrait codec
+        MobTrait.STREAM_CODEC.apply(ByteBufCodecs.list()).encode(buffer, info.capabilities);
+
+        // Write States List
+        MobTrait.STREAM_CODEC.apply(ByteBufCodecs.list()).encode(buffer, info.currentStates);
     }
 
     public static MobScopedInfo read(RegistryFriendlyByteBuf buffer) {
         ResourceLocation id = buffer.readResourceLocation();
         MobScopedInfo info = new MobScopedInfo(id);
 
-        // Read UUID
         if (buffer.readBoolean()) {
             info.setUuid(buffer.readUUID());
         }
@@ -80,10 +104,13 @@ public class MobScopedInfo {
         info.setMovementSpeed(buffer.readDouble());
         info.setArmor(buffer.readDouble());
 
-        int traitCount = buffer.readInt();
-        for (int i = 0; i < traitCount; i++) {
-            info.addTrait(MobTrait.STREAM_CODEC.decode(buffer));
-        }
+        // Read Capabilities
+        List<MobTrait> caps = MobTrait.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buffer);
+        caps.forEach(info::addCapability);
+
+        // Read States
+        List<MobTrait> states = MobTrait.STREAM_CODEC.apply(ByteBufCodecs.list()).decode(buffer);
+        states.forEach(info::addCurrentState);
 
         return info;
     }

@@ -1,7 +1,6 @@
 {
   "type": "memory",
-  "description": "Remembers gathering spot.",
   "icon": "minecraft:bell",
   "target": "minecraft:meeting_point",
-  "title": "Meeting Point"
+  "translation_key": "ethology.trait.memory.minecraft_meeting_point"
 }

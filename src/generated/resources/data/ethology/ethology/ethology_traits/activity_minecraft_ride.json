@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Riding another entity.",
   "icon": "minecraft:saddle",
   "target": "minecraft:ride",
-  "title": "Riding"
+  "translation_key": "ethology.trait.activity.minecraft_ride"
 }

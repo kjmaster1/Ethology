@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Laying eggs or spawning offspring.",
   "icon": "minecraft:turtle_egg",
   "target": "minecraft:lay_spawn",
-  "title": "Laying Spawn"
+  "translation_key": "ethology.trait.activity.minecraft_lay_spawn"
 }

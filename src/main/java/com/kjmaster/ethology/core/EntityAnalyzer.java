@@ -3,31 +3,22 @@ package com.kjmaster.ethology.core;
 import com.kjmaster.ethology.Ethology;
 import com.kjmaster.ethology.EthologyTags;
 import com.kjmaster.ethology.api.MobScopedInfo;
-import com.kjmaster.ethology.api.MobTrait;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ambient.AmbientCreature;
-import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.FlyingAnimal;
-import net.minecraft.world.entity.animal.WaterAnimal;
-import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
 public class EntityAnalyzer {
 
+    /**
+     * Archetype Analysis: Static capabilities only.
+     */
     public static MobScopedInfo analyze(EntityType<?> type, Level level) {
         ResourceLocation key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
-
         if (type.is(EthologyTags.NO_ANALYSIS)) return null;
-
         if (!type.canSummon()) return null;
 
         try {
@@ -36,7 +27,17 @@ public class EntityAnalyzer {
                 if (entity != null) entity.discard();
                 return null;
             }
-            MobScopedInfo info = analyze(living);
+
+            MobScopedInfo info = new MobScopedInfo(key);
+
+            // 1. Stats (Base)
+            extractStats(living, info);
+
+            // 2. Capabilities
+            BrainParser.parseCapabilities(living, info);
+            GoalParser.parseCapabilities(living, info);
+            EcologicalClassifier.classify(living, info);
+
             living.discard();
             return info;
         } catch (Exception e) {
@@ -46,29 +47,23 @@ public class EntityAnalyzer {
     }
 
     /**
-     * Instance Analysis: Analyzes a specific running entity instance.
+     * Instance Analysis: Capabilities + Current State.
      */
     public static MobScopedInfo analyze(LivingEntity living) {
-        EntityType<?> type = living.getType();
-        MobScopedInfo info = new MobScopedInfo(BuiltInRegistries.ENTITY_TYPE.getKey(type));
-
-        // Set UUID for caching
+        MobScopedInfo info = new MobScopedInfo(BuiltInRegistries.ENTITY_TYPE.getKey(living.getType()));
         info.setUuid(living.getUUID());
 
-        // 1. Stats (Current values, not just base)
+        // 1. Stats (Current)
         extractStats(living, info);
 
-        // 2. Logic Analysis
-        boolean hasComplexBrain = !living.getBrain().memories.isEmpty();
+        // 2. Capabilities
+        BrainParser.parseCapabilities(living, info);
+        GoalParser.parseCapabilities(living, info);
+        EcologicalClassifier.classify(living, info);
 
-        if (hasComplexBrain) {
-            BrainParser.parse(living, info);
-        }
-
-        GoalParser.parse(living, info);
-
-        // 3. Fallback Classification
-        applyFallbacks(living, info);
+        // 3. Current State
+        BrainParser.parseCurrentState(living, info);
+        GoalParser.parseCurrentState(living, info);
 
         return info;
     }
@@ -82,28 +77,5 @@ public class EntityAnalyzer {
             info.setMovementSpeed(entity.getAttributeValue(Attributes.MOVEMENT_SPEED));
         if (entity.getAttributes().hasAttribute(Attributes.ARMOR))
             info.setArmor(entity.getAttributeValue(Attributes.ARMOR));
-    }
-
-    private static void applyFallbacks(LivingEntity entity, MobScopedInfo info) {
-        if ((entity instanceof WaterAnimal || entity.canBreatheUnderwater()) && !(entity instanceof ArmorStand)) {
-            addUniqueTrait(info, new MobTrait(new ItemStack(Items.WATER_BUCKET), Component.literal("Aquatic"), Component.literal("Lives and swims in water.")));
-        }
-        if (entity instanceof FlyingAnimal) {
-            addUniqueTrait(info, new MobTrait(new ItemStack(Items.FEATHER), Component.literal("Aerial"), Component.literal("Capable of flight.")));
-        }
-        if (entity instanceof Enemy && info.getTraits().stream().noneMatch(t -> t.title().getString().equals("Hostile"))) {
-            info.addTrait(new MobTrait(new ItemStack(Items.IRON_SWORD), Component.literal("Hostile"), Component.literal("Naturally aggressive monster.")));
-        }
-        if ((entity instanceof Animal || entity instanceof AmbientCreature) && !(entity instanceof Enemy)) {
-            if (info.getTraits().isEmpty()) {
-                info.addTrait(new MobTrait(new ItemStack(Items.GRASS_BLOCK), Component.literal("Passive"), Component.literal("Harmless ambient creature.")));
-            }
-        }
-    }
-
-    private static void addUniqueTrait(MobScopedInfo info, MobTrait trait) {
-        if (info.getTraits().stream().noneMatch(t -> t.title().getString().equals(trait.title().getString()))) {
-            info.addTrait(trait);
-        }
     }
 }

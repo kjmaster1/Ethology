@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Hunts specific enemies.",
   "icon": "minecraft:crossbow",
   "target": "net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal",
-  "title": "Aggressive"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_target_nearestattackabletargetgoal"
 }

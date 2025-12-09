@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Essential brain function.",
   "icon": "minecraft:heart_of_the_sea",
   "target": "minecraft:core",
-  "title": "Core"
+  "translation_key": "ethology.trait.activity.minecraft_core"
 }

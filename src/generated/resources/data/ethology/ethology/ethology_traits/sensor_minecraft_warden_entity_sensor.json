@@ -1,7 +1,6 @@
 {
   "type": "sensor",
-  "description": "Detects vibrations.",
   "icon": "minecraft:sculk_sensor",
   "target": "minecraft:warden_entity_sensor",
-  "title": "Vibration Sense"
+  "translation_key": "ethology.trait.sensor.minecraft_warden_entity_sensor"
 }

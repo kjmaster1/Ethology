@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Breaks down doors.",
   "icon": "minecraft:iron_axe",
   "target": "net.minecraft.world.entity.ai.goal.BreakDoorGoal",
-  "title": "Door Breaker"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_breakdoorgoal"
 }

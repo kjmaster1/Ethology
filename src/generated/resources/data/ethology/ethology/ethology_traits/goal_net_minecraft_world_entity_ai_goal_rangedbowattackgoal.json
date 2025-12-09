@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Shoots arrows at targets.",
   "icon": "minecraft:bow",
   "target": "net.minecraft.world.entity.ai.goal.RangedBowAttackGoal",
-  "title": "Archer"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_rangedbowattackgoal"
 }

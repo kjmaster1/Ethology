@@ -1,9 +1,9 @@
 package com.kjmaster.ethology.core;
 
 import com.kjmaster.ethology.api.IGoalParser;
-import com.kjmaster.ethology.api.MobScopedInfo;
 import com.kjmaster.ethology.api.MobTrait;
-import net.minecraft.network.chat.Component;
+import com.kjmaster.ethology.api.TraitType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.TemptGoal;
@@ -27,7 +27,6 @@ public class GoalParserRegistry {
 
     @SuppressWarnings("unchecked")
     public static <T extends Goal> Optional<IGoalParser<T>> getParser(T goal) {
-        // Walk class hierarchy to find a registered parser for the goal or its parents
         Class<?> current = goal.getClass();
         while (current != Object.class && current != null) {
             if (REGISTRY.containsKey(current)) {
@@ -38,37 +37,38 @@ public class GoalParserRegistry {
         return Optional.empty();
     }
 
-    // Initialize Default Parsers
     static {
-        register(TemptGoal.class, (goal, info) -> {
+        register(TemptGoal.class, (goal, consumer) -> {
             Predicate<ItemStack> predicate = goal.items;
+            MobTrait trait;
+            ResourceLocation id = ResourceLocation.parse("ethology:generated_tempt");
+
+            // Note: We use dynamic translation keys here or reuse generic ones with arguments in a real scenario.
+            // For now, we fit into the existing scheme using TraitType.GOAL
+
             if (predicate instanceof Ingredient ingredient && ingredient.getItems().length > 0) {
-                addUniqueTrait(info, new MobTrait(ingredient.getItems()[0], Component.literal("Temptable"), Component.literal("Follows players holding this.")));
+                trait = new MobTrait(id, ingredient.getItems()[0], "ethology.trait.goal.temptable", TraitType.GOAL);
             } else {
-                addUniqueTrait(info, new MobTrait(new ItemStack(Items.WHEAT), Component.literal("Temptable"), Component.literal("Follows players holding food.")));
+                trait = new MobTrait(id, new ItemStack(Items.WHEAT), "ethology.trait.goal.temptable", TraitType.GOAL);
             }
+            consumer.accept(trait);
         });
 
-        register(AvoidEntityGoal.class, (goal, info) -> {
+        register(AvoidEntityGoal.class, (goal, consumer) -> {
             Class<?> scaredOf = goal.avoidClass;
-            String name = scaredOf.getSimpleName();
-            addUniqueTrait(info, new MobTrait(new ItemStack(Items.BARRIER), Component.literal("Fearful"), Component.literal("Flees from " + name)));
+            ResourceLocation id = ResourceLocation.parse("ethology:generated_fear");
+            // In a full implementation, we might want dynamic names, but for now we map to the generic "Fearful" trait
+            consumer.accept(new MobTrait(id, new ItemStack(Items.BARRIER), "ethology.trait.goal.fearful", TraitType.GOAL));
         });
 
-        register(NearestAttackableTargetGoal.class, (goal, info) -> {
+        register(NearestAttackableTargetGoal.class, (goal, consumer) -> {
             Class<?> targetClass = goal.targetType;
-            String name = targetClass.getSimpleName();
+            ResourceLocation id = ResourceLocation.parse("ethology:generated_aggro");
             if (Player.class.isAssignableFrom(targetClass)) {
-                addUniqueTrait(info, new MobTrait(new ItemStack(Items.RED_DYE), Component.literal("Hostile"), Component.literal("Aggressive towards players.")));
+                consumer.accept(new MobTrait(id, new ItemStack(Items.RED_DYE), "ethology.trait.goal.aggressive", TraitType.GOAL));
             } else {
-                addUniqueTrait(info, new MobTrait(new ItemStack(Items.CROSSBOW), Component.literal("Hunter"), Component.literal("Hunts " + name + "s.")));
+                consumer.accept(new MobTrait(id, new ItemStack(Items.CROSSBOW), "ethology.trait.goal.aggressive", TraitType.GOAL));
             }
         });
-    }
-
-    private static void addUniqueTrait(MobScopedInfo info, MobTrait trait) {
-        if (info.getTraits().stream().noneMatch(t -> t.title().getString().equals(trait.title().getString()))) {
-            info.addTrait(trait);
-        }
     }
 }

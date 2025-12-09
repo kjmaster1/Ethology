@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Attacks those who hurt it.",
   "icon": "minecraft:iron_chestplate",
   "target": "net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal",
-  "title": "Vengeful"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_target_hurtbytargetgoal"
 }

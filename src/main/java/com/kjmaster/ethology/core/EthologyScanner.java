@@ -1,3 +1,4 @@
+// File: src/main/java/com/kjmaster/ethology/core/EthologyScanner.java
 package com.kjmaster.ethology.core;
 
 import com.kjmaster.ethology.Ethology;
@@ -15,33 +16,32 @@ import java.util.Optional;
 
 public class EthologyScanner {
 
-    // Existing archetype scan
+    // Archetype Scan
     public static void scanEntity(EntityType<?> type) {
         Level level = Minecraft.getInstance().level;
         if (level == null) return;
 
-        // Local Guess
         try {
-            // Note: EntityAnalyzer now handles the "Deny List" and try-catch safety internally
+            // Local Archetype Analysis
             MobScopedInfo info = EntityAnalyzer.analyze(type, level);
             if (info != null) EthologyDatabase.register(type, info);
         } catch (Exception e) {
             Ethology.LOGGER.warn("Local analysis failed for {}", BuiltInRegistries.ENTITY_TYPE.getKey(type));
         }
 
-        // Remote Request (Archetype, no UUID)
+        // Remote Request
         if (Minecraft.getInstance().getConnection() != null) {
             PacketDistributor.sendToServer(new RequestScanPayload(BuiltInRegistries.ENTITY_TYPE.getKey(type), Optional.empty()));
         }
     }
 
-    // New Targeted Scan
+    // Targeted Scan
     public static void scanTargetedEntity(LivingEntity target) {
         if (Minecraft.getInstance().getConnection() == null) return;
 
         EntityType<?> type = target.getType();
 
-        // 1. Run local analysis immediately (gets visible data like Health/Armor)
+        // 1. Run local instance analysis
         MobScopedInfo localInfo = null;
         try {
             localInfo = EntityAnalyzer.analyze(target);
@@ -49,27 +49,20 @@ public class EthologyScanner {
             Ethology.LOGGER.warn("Local targeted analysis failed", e);
         }
 
-        // 2. Check for Fresh Data (Rate Limiting)
+        // 2. Check for Fresh Cache (Server Data)
         MobScopedInfo cachedInfo = EthologyDatabase.getFreshInstance(target.getUUID());
         if (cachedInfo != null && localInfo != null) {
-            // Merge Cached Traits (Brain/Goals) into Local Info (Realtime Health)
-            // We use the cached server data to fill in the "Brain" gaps of the local scan
-            for (MobTrait trait : cachedInfo.getTraits()) {
-                // Simple deduplication based on title
-                boolean exists = localInfo.getTraits().stream()
-                        .anyMatch(t -> t.title().getString().equals(trait.title().getString()));
-
-                if (!exists) {
-                    localInfo.addTrait(trait);
-                }
+            // Merge Cache (Capabilities) into Local (State/Stats)
+            // We trust server capabilities more, but local state is immediate
+            for (MobTrait trait : cachedInfo.getCapabilities()) {
+                localInfo.addCapability(trait);
             }
+            // (We generally do not merge state from server cache as local observation is newer)
 
-            // Register the merged result to update the UI immediately
             EthologyDatabase.register(type, localInfo);
-            return; // SKIP NETWORK REQUEST
+            return;
         }
 
-        // 3. If no fresh cache, register local info and request deep analysis
         if (localInfo != null) {
             EthologyDatabase.register(type, localInfo);
         }

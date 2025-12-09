@@ -2,6 +2,7 @@ package com.kjmaster.ethology.datagen;
 
 import com.google.gson.JsonObject;
 import com.kjmaster.ethology.Ethology;
+import com.kjmaster.ethology.api.TraitType;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
@@ -20,64 +21,100 @@ import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class EthologyTraitProvider implements DataProvider {
     private final PackOutput output;
-    private final CompletableFuture<HolderLookup.Provider> lookupProvider;
-    private final Map<ResourceLocation, JsonObject> toSerialize = new HashMap<>();
+    private final Map<ResourceLocation, JsonObject> traitsToSave = new HashMap<>();
+    private final Map<String, String> langEntries = new TreeMap<>();
 
     public EthologyTraitProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
         this.output = output;
-        this.lookupProvider = lookupProvider;
     }
 
     @Override
     public @NotNull CompletableFuture<?> run(@NotNull CachedOutput cache) {
-        toSerialize.clear();
-        addTraits();
+        traitsToSave.clear();
+        langEntries.clear();
 
-        // Save all generated JSONs
-        return CompletableFuture.allOf(toSerialize.entrySet().stream().map(entry -> {
+        addTraits();
+        addManualTranslations(); // Add the missing manual translations
+
+        List<CompletableFuture<?>> futures = new ArrayList<>();
+
+        // 1. Save Trait JSONs
+        for (Map.Entry<ResourceLocation, JsonObject> entry : traitsToSave.entrySet()) {
             Path path = output.getOutputFolder(PackOutput.Target.DATA_PACK)
                     .resolve(Ethology.MODID)
                     .resolve(Ethology.MODID + "/ethology_traits")
                     .resolve(entry.getKey().getPath() + ".json");
-            return DataProvider.saveStable(cache, entry.getValue(), path);
-        }).toArray(CompletableFuture[]::new));
+            futures.add(DataProvider.saveStable(cache, entry.getValue(), path));
+        }
+
+        // 2. Save Lang JSON
+        JsonObject langJson = new JsonObject();
+        langJson.addProperty("itemGroup.ethology", "Ethology");
+        langJson.addProperty("key.ethology.open", "Open Ethology Journal");
+        langJson.addProperty("key.category.ethology", "Ethology");
+
+        // Add "Unknown Goal" fallback for debug mode
+        langJson.addProperty("ethology.trait.goal.unknown.title", "Unknown Behavior");
+        langJson.addProperty("ethology.trait.goal.unknown.static", "Undocumented behavior.");
+        langJson.addProperty("ethology.trait.goal.unknown.active", "Performing unknown behavior.");
+
+        langEntries.forEach(langJson::addProperty);
+
+        Path langPath = output.getOutputFolder(PackOutput.Target.RESOURCE_PACK)
+                .resolve(Ethology.MODID)
+                .resolve("lang/en_us.json");
+        futures.add(DataProvider.saveStable(cache, langJson, langPath));
+
+        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
+    }
+
+    private void addManualTranslations() {
+        // Stats / Ecological Classifier
+        manualTrait("ethology.trait.stat.aquatic", "Aquatic", "Naturally adapted to water.", "Swimming.");
+        manualTrait("ethology.trait.stat.aerial", "Aerial", "Capable of flight.", "Flying.");
+        manualTrait("ethology.trait.stat.passive", "Passive", "Naturally harmless.", "Passive.");
+        manualTrait("ethology.trait.stat.neutral", "Neutral", "Neutral until provoked.", "Neutral.");
+        manualTrait("ethology.trait.stat.hostile", "Hostile", "Aggressive towards players.", "Hostile.");
+
+        // Dynamic Goals
+        manualTrait("ethology.trait.goal.temptable", "Temptable", "Can be tempted with food.", "Being tempted.");
+        manualTrait("ethology.trait.goal.fearful", "Fearful", "Avoids certain threats.", "Fleeing threat.");
+        manualTrait("ethology.trait.goal.aggressive", "Aggressive", "Aggressive towards targets.", "Attacking target.");
     }
 
     private void addTraits() {
         // --- Activities ---
-        activity(Activity.CORE, Items.HEART_OF_THE_SEA, "Core", "Essential brain function.");
-        activity(Activity.IDLE, Items.CLOCK, "Idle", "Waiting for something to happen.");
-        activity(Activity.WORK, Items.CRAFTING_TABLE, "Working", "Performing a profession task.");
-        activity(Activity.PLAY, Items.POPPY, "Playing", "Engaging in play with others.");
-        activity(Activity.REST, Items.RED_BED, "Resting", "Sleeping or recovering.");
-        activity(Activity.MEET, Items.BELL, "Meeting", "Socializing at a meeting point.");
-        activity(Activity.PANIC, Items.SUGAR, "Panic", "Fleeing from immediate danger.");
-        activity(Activity.RAID, Items.CROSSBOW, "Raiding", "Actively participating in a raid.");
-        activity(Activity.PRE_RAID, Items.OMINOUS_BOTTLE, "Pre-Raid", "Preparing for a raid wave.");
-        activity(Activity.HIDE, Items.SHIELD, "Hiding", "Taking cover from threats.");
-        activity(Activity.FIGHT, Items.NETHERITE_SWORD, "Fighting", "Engaging in combat.");
-        activity(Activity.CELEBRATE, Items.FIREWORK_ROCKET, "Celebrating", "Celebrating a victory.");
-        activity(Activity.ADMIRE_ITEM, Items.GOLD_INGOT, "Admiring", "Distracted by a loved item.");
-        activity(Activity.AVOID, Items.CACTUS, "Avoiding", "Keeping distance from threats.");
-        activity(Activity.RIDE, Items.SADDLE, "Riding", "Riding another entity.");
-        activity(Activity.PLAY_DEAD, Items.BONE, "Playing Dead", "Pretending to be dead.");
-        activity(Activity.LONG_JUMP, Items.RABBIT_FOOT, "Leaping", "Performing a long jump.");
-        activity(Activity.RAM, Items.GOAT_HORN, "Ramming", "Charging at a target.");
-        activity(Activity.TONGUE, Items.SLIME_BALL, "Tongue Attack", "Using tongue to catch prey.");
-        activity(Activity.SWIM, Items.WATER_BUCKET, "Swimming", "Swimming in water.");
-        activity(Activity.LAY_SPAWN, Items.TURTLE_EGG, "Laying Spawn", "Laying eggs or spawning offspring.");
-        activity(Activity.SNIFF, Items.MOSS_BLOCK, "Sniffing", "Searching for scents.");
-        activity(Activity.INVESTIGATE, Items.SPYGLASS, "Investigating", "Checking out a disturbance.");
-        activity(Activity.ROAR, Items.SCULK_SHRIEKER, "Roaring", "Emitting a loud roar.");
-        activity(Activity.EMERGE, Items.DIRT, "Emerging", "Digging out of the ground.");
-        activity(Activity.DIG, Items.IRON_SHOVEL, "Digging", "Digging into the ground.");
+        activity(Activity.CORE, Items.HEART_OF_THE_SEA, "Core", "Essential brain function.", "Performing essential brain functions.");
+        activity(Activity.IDLE, Items.CLOCK, "Idle", "Waiting for something to happen.", "Currently idle.");
+        activity(Activity.WORK, Items.CRAFTING_TABLE, "Working", "Can work at a job site.", "Working at job site.");
+        activity(Activity.PLAY, Items.POPPY, "Playing", "Can engage in play with others.", "Playing.");
+        activity(Activity.REST, Items.RED_BED, "Resting", "Can Sleep.", "Sleeping.");
+        activity(Activity.MEET, Items.BELL, "Meeting", "Can Socialize at a meeting point.", "Socializing.");
+        activity(Activity.PANIC, Items.SUGAR, "Panic", "Can Flee from immediate danger.", "Panicking!");
+        activity(Activity.RAID, Items.CROSSBOW, "Raiding", "Can participate in a raid.", "Raiding.");
+        activity(Activity.PRE_RAID, Items.OMINOUS_BOTTLE, "Pre-Raid", "Can prepare for a raid wave.", "Preparing to raid.");
+        activity(Activity.HIDE, Items.SHIELD, "Hiding", "Can take cover from threats.", "Hiding.");
+        activity(Activity.FIGHT, Items.NETHERITE_SWORD, "Fighting", "Can engage in combat.", "Fighting target.");
+        activity(Activity.CELEBRATE, Items.FIREWORK_ROCKET, "Celebrating", "Can celebrate a victory.", "Celebrating.");
+        activity(Activity.ADMIRE_ITEM, Items.GOLD_INGOT, "Admiring", "Can be distracted by a loved item.", "Admiring item.");
+        activity(Activity.AVOID, Items.CACTUS, "Avoiding", "Can Keep distance from threats.", "Fleeing threat.");
+        activity(Activity.RIDE, Items.SADDLE, "Riding", "Can Ride another entity.", "Riding.");
+        activity(Activity.PLAY_DEAD, Items.BONE, "Playing Dead", "Can pretend to be dead.", "Playing dead.");
+        activity(Activity.LONG_JUMP, Items.RABBIT_FOOT, "Leaping", "Can perform a long jump.", "Leaping.");
+        activity(Activity.RAM, Items.GOAT_HORN, "Ramming", "Can charge at a target.", "Ramming.");
+        activity(Activity.TONGUE, Items.SLIME_BALL, "Tongue Attack", "Can use tongue to catch prey.", "Attacking with tongue.");
+        activity(Activity.SWIM, Items.WATER_BUCKET, "Swimming", "Can swim in water.", "Swimming.");
+        activity(Activity.LAY_SPAWN, Items.TURTLE_EGG, "Laying Spawn", "Can lay eggs or spawn offspring.", "Laying spawn.");
+        activity(Activity.SNIFF, Items.MOSS_BLOCK, "Sniffing", "Can searching for scents.", "Sniffing.");
+        activity(Activity.INVESTIGATE, Items.SPYGLASS, "Investigating", "Can check out a disturbance.", "Investigating.");
+        activity(Activity.ROAR, Items.SCULK_SHRIEKER, "Roaring", "Can emit a loud roar.", "Roaring.");
+        activity(Activity.EMERGE, Items.DIRT, "Emerging", "Can emerge out of the ground.", "Emerging from ground.");
+        activity(Activity.DIG, Items.IRON_SHOVEL, "Digging", "Can dig into the ground.", "Digging.");
 
         // --- Sensors ---
         sensor(SensorType.NEAREST_ITEMS, Items.SPYGLASS, "Item Sense", "Can detect nearby items.");
@@ -104,76 +141,80 @@ public class EthologyTraitProvider implements DataProvider {
         memory(MemoryModuleType.BREED_TARGET, Items.HEART_OF_THE_SEA, "Mate", "Focusing on a partner.");
 
         // --- Goals ---
-        // Basic
-        goal(FloatGoal.class, Items.LILY_PAD, "Buoyant", "Floats in water.");
-        goal(PanicGoal.class, Items.SUGAR, "Skittish", "Runs away when hurt.");
-        goal(LookAtPlayerGoal.class, Items.ENDER_EYE, "Watchful", "Watches nearby players.");
-        goal(MeleeAttackGoal.class, Items.IRON_SWORD, "Melee", "Attacks targets in close range.");
-        goal(RangedBowAttackGoal.class, Items.BOW, "Archer", "Shoots arrows at targets.");
-        goal(TemptGoal.class, Items.WHEAT, "Temptable", "Follows players holding food.");
-        goal(BreedGoal.class, Items.EGG, "Breedable", "Can produce offspring.");
-        goal(AvoidEntityGoal.class, Items.BARRIER, "Fearful", "Avoids certain entities.");
-        goal(FleeSunGoal.class, Items.ROTTEN_FLESH, "Photosensitive", "Burns in sunlight.");
-        goal(EatBlockGoal.class, Items.GRASS_BLOCK, "Grazer", "Eats grass to regain health.");
-
-        // Doors
-        goal(OpenDoorGoal.class, Items.OAK_DOOR, "Door User", "Can open doors.");
-        goal(BreakDoorGoal.class, Items.IRON_AXE, "Door Breaker", "Breaks down doors.");
-
-        // Advanced
-        goal(SwellGoal.class, Items.TNT, "Explosive", "Detonates near targets.");
-        goal(SitWhenOrderedToGoal.class, Items.LEAD, "Obedient", "Sits when ordered.");
-        goal(FollowOwnerGoal.class, Items.BONE, "Loyal", "Follows its owner.");
-        goal(DefendVillageTargetGoal.class, Items.SHIELD, "Guardian", "Defends the village.");
-        goal(HurtByTargetGoal.class, Items.IRON_CHESTPLATE, "Vengeful", "Attacks those who hurt it.");
-        goal(NearestAttackableTargetGoal.class, Items.CROSSBOW, "Aggressive", "Hunts specific enemies.");
-        goal(RandomStrollGoal.class, Items.LEATHER_BOOTS, "Wanderer", "Roams randomly.");
-        goal(WaterAvoidingRandomStrollGoal.class, Items.LEATHER_BOOTS, "Land Wanderer", "Roams without entering water.");
-
-        // Add more from your list as needed using the goal() helper
+        goal(FloatGoal.class, Items.LILY_PAD, "Buoyant", "Floats in water.", "Floating.");
+        goal(PanicGoal.class, Items.SUGAR, "Skittish", "Runs away when hurt.", "Fleeing.");
+        goal(LookAtPlayerGoal.class, Items.ENDER_EYE, "Watchful", "Watches nearby players.", "Watching player.");
+        goal(MeleeAttackGoal.class, Items.IRON_SWORD, "Melee", "Attacks targets in close range.", "Attacking (Melee).");
+        goal(RangedBowAttackGoal.class, Items.BOW, "Archer", "Shoots arrows at targets.", "Shooting arrows.");
+        goal(TemptGoal.class, Items.WHEAT, "Temptable", "Follows players holding food.", "Being tempted.");
+        goal(BreedGoal.class, Items.EGG, "Breedable", "Can produce offspring.", "Breeding.");
+        goal(AvoidEntityGoal.class, Items.BARRIER, "Fearful", "Avoids certain entities.", "Avoiding threat.");
+        goal(FleeSunGoal.class, Items.ROTTEN_FLESH, "Photosensitive", "Burns in sunlight.", "Fleeing sun.");
+        goal(EatBlockGoal.class, Items.GRASS_BLOCK, "Grazer", "Eats grass to regain health.", "Grazing.");
+        goal(OpenDoorGoal.class, Items.OAK_DOOR, "Door User", "Can open doors.", "Opening door.");
+        goal(BreakDoorGoal.class, Items.IRON_AXE, "Door Breaker", "Breaks down doors.", "Breaking door.");
+        goal(SwellGoal.class, Items.TNT, "Explosive", "Detonates near targets.", "Exploding.");
+        goal(SitWhenOrderedToGoal.class, Items.LEAD, "Obedient", "Sits when ordered.", "Sitting.");
+        goal(FollowOwnerGoal.class, Items.BONE, "Loyal", "Follows its owner.", "Following owner.");
+        goal(DefendVillageTargetGoal.class, Items.SHIELD, "Guardian", "Defends the village.", "Defending village.");
+        goal(HurtByTargetGoal.class, Items.IRON_CHESTPLATE, "Vengeful", "Attacks those who hurt it.", "Seeking vengeance.");
+        goal(NearestAttackableTargetGoal.class, Items.CROSSBOW, "Aggressive", "Hunts specific enemies.", "Hunting target.");
+        goal(RandomStrollGoal.class, Items.LEATHER_BOOTS, "Wanderer", "Roams randomly.", "Wandering.");
+        goal(WaterAvoidingRandomStrollGoal.class, Items.LEATHER_BOOTS, "Land Wanderer", "Roams without entering water.", "Wandering (Land).");
     }
 
     // --- Helpers ---
 
-    private void activity(Activity activity, Item icon, String title, String description) {
+    private void manualTrait(String key, String title, String staticDesc, String activeDesc) {
+        langEntries.put(key + ".title", title);
+        langEntries.put(key + ".static", staticDesc);
+        langEntries.put(key + ".active", activeDesc);
+    }
+
+    private void activity(Activity activity, Item icon, String title, String staticDesc, String activeDesc) {
         ResourceLocation key = BuiltInRegistries.ACTIVITY.getKey(activity);
-        if (key == null) {
-            Ethology.LOGGER.warn("No key found for activity: {}", activity.getName());
-            return;
-        }
-        createJson("activity", key.toString(), icon, title, description);
+        createJson(TraitType.ACTIVITY, key.toString(), icon, title, staticDesc, activeDesc);
     }
 
-    private void sensor(SensorType<?> sensor, Item icon, String title, String description) {
+    private void sensor(SensorType<?> sensor, Item icon, String title, String staticDesc) {
         ResourceLocation key = BuiltInRegistries.SENSOR_TYPE.getKey(sensor);
-        createJson("sensor", key.toString(), icon, title, description);
+        createJson(TraitType.SENSOR, key.toString(), icon, title, staticDesc, null);
     }
 
-    private void memory(MemoryModuleType<?> memory, Item icon, String title, String description) {
+    private void memory(MemoryModuleType<?> memory, Item icon, String title, String staticDesc) {
         ResourceLocation key = BuiltInRegistries.MEMORY_MODULE_TYPE.getKey(memory);
-        createJson("memory", key.toString(), icon, title, description);
+        createJson(TraitType.MEMORY, key.toString(), icon, title, staticDesc, null);
     }
 
-    private void goal(Class<?> goalClass, Item icon, String title, String description) {
-        createJson("goal", goalClass.getName(), icon, title, description);
+    private void goal(Class<?> goalClass, Item icon, String title, String staticDesc, String activeDesc) {
+        createJson(TraitType.GOAL, goalClass.getName(), icon, title, staticDesc, activeDesc);
     }
 
-    private void createJson(String type, String target, Item icon, String title, String description) {
+    private void createJson(TraitType type, String target, Item icon, String title, String staticDesc, String activeDesc) {
+        String keyBase = target.replace(":", ".").replace(".", "_").toLowerCase(Locale.ROOT);
+        String translationKey = "ethology.trait." + type.name().toLowerCase() + "." + keyBase;
+
+        langEntries.put(translationKey + ".title", title);
+        langEntries.put(translationKey + ".static", staticDesc);
+        if (activeDesc != null) {
+            langEntries.put(translationKey + ".active", activeDesc);
+        } else {
+            langEntries.put(translationKey + ".active", staticDesc);
+        }
+
         JsonObject json = new JsonObject();
-        json.addProperty("type", type);
+        json.addProperty("type", type.name().toLowerCase());
         json.addProperty("target", target);
+        json.addProperty("translation_key", translationKey);
         json.addProperty("icon", BuiltInRegistries.ITEM.getKey(icon).toString());
-        json.addProperty("title", title);
-        json.addProperty("description", description);
 
-        // Save as <type>_<target_path>.json to avoid name collisions
-        String filename = type + "_" + target.replace(":", "_").replace(".", "_")
+        String filename = type.name().toLowerCase() + "_" + target.replace(":", "_").replace(".", "_")
                 .toLowerCase(Locale.ROOT);
-        toSerialize.put(ResourceLocation.fromNamespaceAndPath(Ethology.MODID, filename), json);
+        traitsToSave.put(ResourceLocation.fromNamespaceAndPath(Ethology.MODID, filename), json);
     }
 
     @Override
     public @NotNull String getName() {
-        return "Ethology Traits";
+        return "Ethology Traits & Lang";
     }
 }

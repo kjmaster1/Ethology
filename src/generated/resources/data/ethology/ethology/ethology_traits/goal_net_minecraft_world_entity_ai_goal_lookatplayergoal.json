@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Watches nearby players.",
   "icon": "minecraft:ender_eye",
   "target": "net.minecraft.world.entity.ai.goal.LookAtPlayerGoal",
-  "title": "Watchful"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_lookatplayergoal"
 }

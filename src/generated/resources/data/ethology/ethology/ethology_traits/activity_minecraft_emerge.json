@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Digging out of the ground.",
   "icon": "minecraft:dirt",
   "target": "minecraft:emerge",
-  "title": "Emerging"
+  "translation_key": "ethology.trait.activity.minecraft_emerge"
 }

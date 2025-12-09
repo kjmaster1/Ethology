@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Sleeping or recovering.",
   "icon": "minecraft:red_bed",
   "target": "minecraft:rest",
-  "title": "Resting"
+  "translation_key": "ethology.trait.activity.minecraft_rest"
 }

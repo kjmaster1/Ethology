@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Burns in sunlight.",
   "icon": "minecraft:rotten_flesh",
   "target": "net.minecraft.world.entity.ai.goal.FleeSunGoal",
-  "title": "Photosensitive"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_fleesungoal"
 }

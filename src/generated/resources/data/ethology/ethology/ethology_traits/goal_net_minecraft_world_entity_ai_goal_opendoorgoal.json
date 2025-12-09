@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Can open doors.",
   "icon": "minecraft:oak_door",
   "target": "net.minecraft.world.entity.ai.goal.OpenDoorGoal",
-  "title": "Door User"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_opendoorgoal"
 }

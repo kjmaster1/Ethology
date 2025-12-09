@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Checking out a disturbance.",
   "icon": "minecraft:spyglass",
   "target": "minecraft:investigate",
-  "title": "Investigating"
+  "translation_key": "ethology.trait.activity.minecraft_investigate"
 }

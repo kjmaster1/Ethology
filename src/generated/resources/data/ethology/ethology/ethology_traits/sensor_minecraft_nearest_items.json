@@ -1,7 +1,6 @@
 {
   "type": "sensor",
-  "description": "Can detect nearby items.",
   "icon": "minecraft:spyglass",
   "target": "minecraft:nearest_items",
-  "title": "Item Sense"
+  "translation_key": "ethology.trait.sensor.minecraft_nearest_items"
 }

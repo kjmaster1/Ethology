@@ -1,7 +1,6 @@
 {
   "type": "memory",
-  "description": "Remembers home location.",
   "icon": "minecraft:red_bed",
   "target": "minecraft:home",
-  "title": "Home"
+  "translation_key": "ethology.trait.memory.minecraft_home"
 }

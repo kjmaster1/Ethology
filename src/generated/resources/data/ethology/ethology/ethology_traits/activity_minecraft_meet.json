@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Socializing at a meeting point.",
   "icon": "minecraft:bell",
   "target": "minecraft:meet",
-  "title": "Meeting"
+  "translation_key": "ethology.trait.activity.minecraft_meet"
 }

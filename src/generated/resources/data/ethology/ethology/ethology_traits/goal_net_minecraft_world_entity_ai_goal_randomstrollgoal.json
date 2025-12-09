@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Roams randomly.",
   "icon": "minecraft:leather_boots",
   "target": "net.minecraft.world.entity.ai.goal.RandomStrollGoal",
-  "title": "Wanderer"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_randomstrollgoal"
 }

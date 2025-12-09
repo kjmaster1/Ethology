@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Preparing for a raid wave.",
   "icon": "minecraft:ominous_bottle",
   "target": "minecraft:pre_raid",
-  "title": "Pre-Raid"
+  "translation_key": "ethology.trait.activity.minecraft_pre_raid"
 }

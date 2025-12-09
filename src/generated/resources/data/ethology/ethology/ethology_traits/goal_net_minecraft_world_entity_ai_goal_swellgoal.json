@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Detonates near targets.",
   "icon": "minecraft:tnt",
   "target": "net.minecraft.world.entity.ai.goal.SwellGoal",
-  "title": "Explosive"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_swellgoal"
 }

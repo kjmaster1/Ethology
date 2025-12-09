@@ -1,7 +1,6 @@
 {
   "type": "sensor",
-  "description": "Senses piglins and repellents.",
   "icon": "minecraft:crimson_fungus",
   "target": "minecraft:hoglin_specific_sensor",
-  "title": "Hoglin Logic"
+  "translation_key": "ethology.trait.sensor.minecraft_hoglin_specific_sensor"
 }

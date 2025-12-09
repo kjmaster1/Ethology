@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Performing a long jump.",
   "icon": "minecraft:rabbit_foot",
   "target": "minecraft:long_jump",
-  "title": "Leaping"
+  "translation_key": "ethology.trait.activity.minecraft_long_jump"
 }

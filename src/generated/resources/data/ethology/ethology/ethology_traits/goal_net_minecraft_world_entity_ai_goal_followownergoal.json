@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Follows its owner.",
   "icon": "minecraft:bone",
   "target": "net.minecraft.world.entity.ai.goal.FollowOwnerGoal",
-  "title": "Loyal"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_followownergoal"
 }

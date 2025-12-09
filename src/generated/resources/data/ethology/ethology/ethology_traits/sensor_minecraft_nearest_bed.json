@@ -1,7 +1,6 @@
 {
   "type": "sensor",
-  "description": "Can locate beds.",
   "icon": "minecraft:red_bed",
   "target": "minecraft:nearest_bed",
-  "title": "Bed Sense"
+  "translation_key": "ethology.trait.sensor.minecraft_nearest_bed"
 }

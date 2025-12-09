@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Floats in water.",
   "icon": "minecraft:lily_pad",
   "target": "net.minecraft.world.entity.ai.goal.FloatGoal",
-  "title": "Buoyant"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_floatgoal"
 }

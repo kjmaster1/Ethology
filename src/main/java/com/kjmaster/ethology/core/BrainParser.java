@@ -2,7 +2,6 @@ package com.kjmaster.ethology.core;
 
 import com.kjmaster.ethology.Ethology;
 import com.kjmaster.ethology.api.MobScopedInfo;
-import com.kjmaster.ethology.api.MobTrait;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -13,44 +12,36 @@ import java.util.Map;
 
 public class BrainParser {
 
-    public static void parse(LivingEntity entity, MobScopedInfo info) {
+    // Helper: Static Traits (Capabilities)
+    public static void parseCapabilities(LivingEntity entity, MobScopedInfo info) {
         Brain<?> brain = entity.getBrain();
-        parseSensors(brain, info);
-        parseMemories(brain, info);
-        parseActivities(brain, info);
-    }
 
-    private static void parseActivities(Brain<?> brain, MobScopedInfo info) {
-        // Iterate over all activities in the brain
+        // 1. Sensors
+        for (SensorType<?> sensorType : brain.sensors.keySet()) {
+            Ethology.TRAIT_MANAGER.getTrait(sensorType).ifPresent(info::addCapability);
+        }
+
+        // 2. Memories (Potential)
+        for (MemoryModuleType<?> type : brain.memories.keySet()) {
+            Ethology.TRAIT_MANAGER.getTrait(type).ifPresent(info::addCapability);
+        }
+
+        // 3. Activities (Potential Behaviors)
         for (Map<Activity, ?> innerMap : brain.availableBehaviorsByPriority.values()) {
             for (Activity activity : innerMap.keySet()) {
-                // Query the Manager
-                Ethology.TRAIT_MANAGER.getTrait(activity).ifPresent(trait ->
-                        addUniqueTrait(info, trait)
-                );
+                Ethology.TRAIT_MANAGER.getTrait(activity).ifPresent(info::addCapability);
             }
         }
     }
 
-    private static void parseSensors(Brain<?> brain, MobScopedInfo info) {
-        for (SensorType<?> sensorType : brain.sensors.keySet()) {
-            Ethology.TRAIT_MANAGER.getTrait(sensorType).ifPresent(trait ->
-                    addUniqueTrait(info, trait)
-            );
-        }
-    }
+    // Helper: Dynamic State
+    public static void parseCurrentState(LivingEntity entity, MobScopedInfo info) {
+        Brain<?> brain = entity.getBrain();
 
-    private static void parseMemories(Brain<?> brain, MobScopedInfo info) {
-        for (MemoryModuleType<?> type : brain.memories.keySet()) {
-            Ethology.TRAIT_MANAGER.getTrait(type).ifPresent(trait ->
-                    addUniqueTrait(info, trait)
-            );
-        }
-    }
-
-    private static void addUniqueTrait(MobScopedInfo info, MobTrait trait) {
-        if (info.getTraits().stream().noneMatch(t -> t.title().getString().equals(trait.title().getString()))) {
-            info.addTrait(trait);
+        // Active Activities
+        // In 1.21, activeActivities is the set of currently running activities
+        for (Activity activity : brain.activeActivities) {
+            Ethology.TRAIT_MANAGER.getTrait(activity).ifPresent(info::addCurrentState);
         }
     }
 }

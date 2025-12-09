@@ -1,7 +1,6 @@
 {
   "type": "sensor",
-  "description": "Remembers who hurt it.",
   "icon": "minecraft:iron_axe",
   "target": "minecraft:hurt_by",
-  "title": "Damage Sense"
+  "translation_key": "ethology.trait.sensor.minecraft_hurt_by"
 }

@@ -1,7 +1,6 @@
 {
   "type": "memory",
-  "description": "Angry at a specific entity.",
   "icon": "minecraft:blaze_powder",
   "target": "minecraft:angry_at",
-  "title": "Anger"
+  "translation_key": "ethology.trait.memory.minecraft_angry_at"
 }

@@ -1,7 +1,6 @@
 {
   "type": "sensor",
-  "description": "Detects Iron Golems.",
   "icon": "minecraft:iron_block",
   "target": "minecraft:golem_detected",
-  "title": "Golem Sense"
+  "translation_key": "ethology.trait.sensor.minecraft_golem_detected"
 }

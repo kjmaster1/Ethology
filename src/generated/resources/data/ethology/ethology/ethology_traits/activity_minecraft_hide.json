@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Taking cover from threats.",
   "icon": "minecraft:shield",
   "target": "minecraft:hide",
-  "title": "Hiding"
+  "translation_key": "ethology.trait.activity.minecraft_hide"
 }

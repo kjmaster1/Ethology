@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Runs away when hurt.",
   "icon": "minecraft:sugar",
   "target": "net.minecraft.world.entity.ai.goal.PanicGoal",
-  "title": "Skittish"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_panicgoal"
 }

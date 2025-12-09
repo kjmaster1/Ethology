@@ -1,10 +1,12 @@
+// File: src/main/java/com/kjmaster/ethology/core/GoalParser.java
 package com.kjmaster.ethology.core;
 
 import com.kjmaster.ethology.Config;
 import com.kjmaster.ethology.Ethology;
 import com.kjmaster.ethology.api.MobScopedInfo;
 import com.kjmaster.ethology.api.MobTrait;
-import net.minecraft.network.chat.Component;
+import com.kjmaster.ethology.api.TraitType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -13,63 +15,62 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class GoalParser {
 
-    public static void parse(LivingEntity entity, MobScopedInfo info) {
+    public static void parseCapabilities(LivingEntity entity, MobScopedInfo info) {
         if (!(entity instanceof Mob mob)) return;
 
-        // 1. Analyze Task Goals (Behaviors)
-        for (WrappedGoal wrapped : mob.goalSelector.availableGoals) {
-            parseGoal(wrapped, info);
+        // Analyze Task Goals
+        for (WrappedGoal wrapped : mob.goalSelector.getAvailableGoals()) {
+            parseGoal(wrapped, info::addCapability);
         }
-
-        // 2. Analyze Target Goals (Agro)
-        for (WrappedGoal wrapped : mob.targetSelector.availableGoals) {
-            parseGoal(wrapped, info);
+        // Analyze Target Goals
+        for (WrappedGoal wrapped : mob.targetSelector.getAvailableGoals()) {
+            parseGoal(wrapped, info::addCapability);
         }
     }
 
-    private static void parseGoal(Goal inputGoal, MobScopedInfo info) {
-        // Recursive Unwrapping ensures we find the real logic even if wrapped by other mods
+    public static void parseCurrentState(LivingEntity entity, MobScopedInfo info) {
+        if (!(entity instanceof Mob mob)) return;
+
+        // Check Running Goals
+        // WrappedGoal usually exposes isRunning() if getRunningGoals() isn't available easily
+        for (WrappedGoal wrapped : mob.goalSelector.getAvailableGoals()) {
+            if (wrapped.isRunning()) {
+                parseGoal(wrapped, info::addCurrentState);
+            }
+        }
+    }
+
+    private static void parseGoal(Goal inputGoal, Consumer<MobTrait> consumer) {
         Goal innerGoal = unwrap(inputGoal);
 
-        // A. Registry Lookup (Static JSON Traits)
-        // This handles standard goals defined in JSON (e.g., Breed, Panic, Float)
+        // A. Static JSON Lookup
         Optional<MobTrait> traitOpt = Ethology.TRAIT_MANAGER.getTrait(innerGoal.getClass());
-
         if (traitOpt.isPresent()) {
-            addUniqueTrait(info, traitOpt.get());
+            consumer.accept(traitOpt.get());
         } else if (Config.DEBUG_MODE.get()) {
-            // Debug Mode: Render unknown goals so developers know what JSONs to create
-            addUniqueTrait(info, new MobTrait(
+            consumer.accept(new MobTrait(
+                    ResourceLocation.parse("ethology:debug_" + innerGoal.getClass().getSimpleName().toLowerCase()),
                     new ItemStack(Items.BARRIER),
-                    Component.literal("Unknown Goal"),
-                    Component.literal(innerGoal.getClass().getName())
+                    "ethology.trait.goal.unknown",
+                    TraitType.GOAL
             ));
         }
 
-        // B. Dynamic Goal Analysis via Registry
-        // This allows code-based extraction of data (e.g., extracting specific items from TemptGoal)
+        // B. Dynamic Analysis
         GoalParserRegistry.getParser(innerGoal).ifPresent(parser ->
-                parser.parse(innerGoal, info)
+                parser.parse(innerGoal, consumer)
         );
     }
 
-    /**
-     * Recursively unwraps the goal to handle nested wrappers (e.g. from AI optimization mods).
-     */
     private static Goal unwrap(Goal goal) {
         Goal current = goal;
         while (current instanceof WrappedGoal wrapped) {
             current = wrapped.getGoal();
         }
         return current;
-    }
-
-    private static void addUniqueTrait(MobScopedInfo info, MobTrait trait) {
-        if (info.getTraits().stream().noneMatch(t -> t.title().getString().equals(trait.title().getString()))) {
-            info.addTrait(trait);
-        }
     }
 }

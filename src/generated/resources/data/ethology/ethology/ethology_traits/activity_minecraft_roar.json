@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Emitting a loud roar.",
   "icon": "minecraft:sculk_shrieker",
   "target": "minecraft:roar",
-  "title": "Roaring"
+  "translation_key": "ethology.trait.activity.minecraft_roar"
 }

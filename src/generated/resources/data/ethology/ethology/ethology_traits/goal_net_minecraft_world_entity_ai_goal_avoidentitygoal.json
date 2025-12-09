@@ -1,7 +1,6 @@
 {
   "type": "goal",
-  "description": "Avoids certain entities.",
   "icon": "minecraft:barrier",
   "target": "net.minecraft.world.entity.ai.goal.AvoidEntityGoal",
-  "title": "Fearful"
+  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_avoidentitygoal"
 }

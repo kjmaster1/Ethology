@@ -1,7 +1,6 @@
 {
   "type": "activity",
-  "description": "Fleeing from immediate danger.",
   "icon": "minecraft:sugar",
   "target": "minecraft:panic",
-  "title": "Panic"
+  "translation_key": "ethology.trait.activity.minecraft_panic"
 }
