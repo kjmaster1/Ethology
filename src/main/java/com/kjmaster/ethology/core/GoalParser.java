@@ -1,14 +1,18 @@
 package com.kjmaster.ethology.core;
 
+import com.kjmaster.ethology.Config;
 import com.kjmaster.ethology.Ethology;
 import com.kjmaster.ethology.api.MobScopedInfo;
 import com.kjmaster.ethology.api.MobTrait;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
-import java.util.Set;
+import java.util.Optional;
 
 public class GoalParser {
 
@@ -32,9 +36,18 @@ public class GoalParser {
 
         // A. Registry Lookup (Static JSON Traits)
         // This handles standard goals defined in JSON (e.g., Breed, Panic, Float)
-        Ethology.TRAIT_MANAGER.getTrait(innerGoal.getClass()).ifPresent(trait ->
-                addUniqueTrait(info, trait)
-        );
+        Optional<MobTrait> traitOpt = Ethology.TRAIT_MANAGER.getTrait(innerGoal.getClass());
+
+        if (traitOpt.isPresent()) {
+            addUniqueTrait(info, traitOpt.get());
+        } else if (Config.DEBUG_MODE.get()) {
+            // Debug Mode: Render unknown goals so developers know what JSONs to create
+            addUniqueTrait(info, new MobTrait(
+                    new ItemStack(Items.BARRIER),
+                    Component.literal("Unknown Goal"),
+                    Component.literal(innerGoal.getClass().getName())
+            ));
+        }
 
         // B. Dynamic Goal Analysis via Registry
         // This allows code-based extraction of data (e.g., extracting specific items from TemptGoal)
