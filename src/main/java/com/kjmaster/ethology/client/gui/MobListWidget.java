@@ -1,7 +1,5 @@
 package com.kjmaster.ethology.client.gui;
 
-import com.kjmaster.ethology.api.MobScopedInfo;
-import com.kjmaster.ethology.core.EthologyDatabase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
@@ -15,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 
@@ -37,13 +36,21 @@ public class MobListWidget extends ObjectSelectionList<MobListWidget.MobEntry> {
         return this.getX() + this.width - 6;
     }
 
+    @Override
+    public void setSelected(@Nullable MobEntry entry) {
+        super.setSelected(entry);
+        // Notify parent of selection change immediately
+        if (entry != null) {
+            this.parent.onMobSelected(entry.type);
+        }
+    }
+
     public void refreshList(String filter) {
         this.clearEntries();
         String lowerFilter = filter.toLowerCase();
 
-        // Iterate Registry instead of Database
         BuiltInRegistries.ENTITY_TYPE.stream()
-                .filter(this::isLikelyMob) // Lightweight filter
+                .filter(this::isLikelyMob)
                 .sorted(Comparator.comparing(e -> e.getDescription().getString()))
                 .forEach(type -> {
                     if (type.getDescription().getString().toLowerCase().contains(lowerFilter)) {
@@ -52,27 +59,12 @@ public class MobListWidget extends ObjectSelectionList<MobListWidget.MobEntry> {
                 });
     }
 
-    /**
-     * Filters out technical entities, projectiles, and non-living objects
-     * to ensure the list only contains analyzable Mobs.
-     */
     private boolean isLikelyMob(EntityType<?> type) {
-        // 1. Must be Summonable (filters out technical entities like Lightning, Fishing Bobbers, etc.)
         if (!type.canSummon()) return false;
-
-        // 2. Category Filter (Filters out Items, Projectiles, etc.)
         if (type.getCategory() == MobCategory.MISC) return false;
-
-        // 3. Must have Default Attributes (Health, etc.)
-        // This acts as a robust check for "Is this a Living Entity?".
-        // It filters out Boats, Minecarts, and Primed TNT which are not MISC but have no biology.
         if (!DefaultAttributes.hasSupplier(type)) return false;
-
-        // 4. Specific Exclusions
-        // Armor Stands are technically LivingEntities with attributes, but we don't study their behavior.
         if (type == EntityType.ARMOR_STAND) return false;
-        if (type == EntityType.GIANT) return false; // Vanilla Giants are non-functional and often have no AI.
-
+        if (type == EntityType.GIANT) return false;
         return true;
     }
 
@@ -110,8 +102,6 @@ public class MobListWidget extends ObjectSelectionList<MobListWidget.MobEntry> {
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             MobListWidget.this.setSelected(this);
-            // Notify parent to trigger scan
-            parent.onMobSelected(this.type);
             return true;
         }
 

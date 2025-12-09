@@ -14,8 +14,15 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @EventBusSubscriber(modid = Ethology.MODID)
 public class EthologyPacketHandler {
+
+    // Server-side cache to store analyzed archetype data.
+    // This prevents expensive Entity instantiation for every client request.
+    private static final Map<EntityType<?>, MobScopedInfo> ARCHETYPE_CACHE = new HashMap<>();
 
     @SubscribeEvent
     public static void register(RegisterPayloadHandlersEvent event) {
@@ -51,6 +58,7 @@ public class EthologyPacketHandler {
             Entity target = player.serverLevel().getEntity(payload.instanceId().get());
             if (target instanceof LivingEntity living) {
                 try {
+                    // Instance scans are unique (specific health/armor), so we do not cache them globally.
                     MobScopedInfo info = EntityAnalyzer.analyze(living);
                     player.connection.send(new SyncMobDataPayload(info));
                 } catch (Exception e) {
@@ -66,13 +74,29 @@ public class EthologyPacketHandler {
             return; // Invalid ID
         }
 
+        // CHECK CACHE: If we have already analyzed this archetype, send the cached result.
+        if (ARCHETYPE_CACHE.containsKey(type)) {
+            player.connection.send(new SyncMobDataPayload(ARCHETYPE_CACHE.get(type)));
+            return;
+        }
+
+        // If not in cache, perform analysis
         try {
+            // This is the expensive operation we are trying to minimize
             MobScopedInfo info = EntityAnalyzer.analyze(type, player.serverLevel());
             if (info != null) {
+                ARCHETYPE_CACHE.put(type, info); // Store result in cache
                 player.connection.send(new SyncMobDataPayload(info));
             }
         } catch (Exception e) {
             Ethology.LOGGER.warn("Failed to analyze entity archetype: {}", payload.typeId(), e);
         }
+    }
+
+    /**
+     * Clears the server-side archetype cache.
+     */
+    public static void clearCache() {
+        ARCHETYPE_CACHE.clear();
     }
 }

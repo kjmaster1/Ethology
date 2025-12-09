@@ -39,6 +39,12 @@ public class EthologyScreen extends Screen {
     private float xMouse;
     private float yMouse;
 
+    // Debounce State
+    private EntityType<?> pendingScanType;
+    private long lastSelectionTime;
+    private static final long DEBOUNCE_DELAY_MS = 300;
+    private boolean suppressSelectionEvent = false;
+
     public EthologyScreen() {
         super(Component.literal("Ethology"));
     }
@@ -48,19 +54,15 @@ public class EthologyScreen extends Screen {
         this.layout.addTitleHeader(this.title, this.font);
 
         // 1. Calculate Dynamic Widths
-        // Left Panel: ~25% of screen, Min 130px, Max 250px
         this.leftPanelWidth = Math.clamp((int)(this.width * 0.25), 130, 250);
-
-        // Right Panel: ~30% of screen, Min 170px, Max 350px
         this.rightPanelWidth = Math.clamp((int)(this.width * 0.30), 170, 350);
 
-        int contentTop = HEADER_HEIGHT + 24; // Space for header + search
+        int contentTop = HEADER_HEIGHT + 24;
         int contentHeight = this.height - contentTop - 10;
 
-        // 2. Search Box (Top Left)
-        // Matches the width of the left panel
+        // 2. Search Box
         this.searchBox = new EditBox(this.font, this.leftPanelWidth, 20, Component.literal("Search..."));
-        this.searchBox.setPosition(10, HEADER_HEIGHT); // 10px Margin
+        this.searchBox.setPosition(10, HEADER_HEIGHT);
         this.searchBox.setResponder(text -> {
             if (this.listWidget != null) this.listWidget.refreshList(text);
         });
@@ -68,12 +70,12 @@ public class EthologyScreen extends Screen {
 
         // 3. Left List (Mob List)
         this.listWidget = new MobListWidget(this.minecraft, this.leftPanelWidth, contentHeight, contentTop, 24, this);
-        this.listWidget.setX(10); // 10px Margin
+        this.listWidget.setX(10);
         this.addRenderableWidget(this.listWidget);
 
         // 4. Right List (Info Panel)
         this.infoWidget = new MobInfoWidget(this.minecraft, this.rightPanelWidth, contentHeight, contentTop);
-        this.infoWidget.setX(this.width - this.rightPanelWidth - 10); // 10px Margin from right
+        this.infoWidget.setX(this.width - this.rightPanelWidth - 10);
         this.addRenderableWidget(this.infoWidget);
 
         this.layout.visitWidgets(this::addRenderableWidget);
@@ -85,32 +87,37 @@ public class EthologyScreen extends Screen {
             // Trigger State-Aware Scan
             EthologyScanner.scanTargetedEntity(living);
 
-            // Auto-select in list
-            this.listWidget.setSelectedByType(living.getType());
-
             // Set cached entity to the actual instance for "True" preview
-            // Note: renderEntityInInventory might need a copy if the world entity moves too much,
-            // but for a paused screen or short viewing, using the instance directly is fine.
             this.cachedEntity = living;
 
             // Update info immediately with local data
             this.infoWidget.updateInfo(EthologyDatabase.get(living.getType()));
+
+            // Auto-select in list without triggering debounce scan
+            this.suppressSelectionEvent = true;
+            this.listWidget.setSelectedByType(living.getType());
+            this.suppressSelectionEvent = false;
         }
-
-
     }
 
     @Override
     protected void repositionElements() {
         this.layout.arrangeElements();
-        // Ensure widgets stay pinned to their margins on resize
         if (searchBox != null) searchBox.setX(10);
         if (listWidget != null) listWidget.setX(10);
         if (infoWidget != null) infoWidget.setX(this.width - this.rightPanelWidth - 10);
     }
 
     public void onMobSelected(EntityType<?> type) {
-        // Trigger Lazy Scan
+        if (suppressSelectionEvent) return;
+
+        // Reset timer and update pending target
+        this.pendingScanType = type;
+        this.lastSelectionTime = System.currentTimeMillis();
+    }
+
+    private void executeScan(EntityType<?> type) {
+        // Trigger Lazy Scan (Archetype)
         EthologyScanner.scanEntity(type);
 
         // Fetch Result (Immediate local or waiting for packet)
@@ -139,6 +146,14 @@ public class EthologyScreen extends Screen {
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
 
+        // Debounce Logic: Check if it's time to scan
+        if (this.pendingScanType != null) {
+            if (System.currentTimeMillis() - this.lastSelectionTime >= DEBOUNCE_DELAY_MS) {
+                executeScan(this.pendingScanType);
+                this.pendingScanType = null;
+            }
+        }
+
         // Draw Entity in the remaining center space
         drawCenterViewport(graphics, mouseX, mouseY);
 
@@ -148,8 +163,7 @@ public class EthologyScreen extends Screen {
 
     private void drawCenterViewport(GuiGraphics graphics, int mouseX, int mouseY) {
         if (this.cachedEntity == null) {
-            // Draw empty state hint centered in the available viewport
-            int viewStartX = this.leftPanelWidth + 20; // 10px margin + 10px padding
+            int viewStartX = this.leftPanelWidth + 20;
             int viewEndX = this.width - this.rightPanelWidth - 20;
             int centerX = viewStartX + ((viewEndX - viewStartX) / 2);
 
@@ -157,36 +171,28 @@ public class EthologyScreen extends Screen {
             return;
         }
 
-        // 1. Define Viewport Bounds
         int viewStartX = this.leftPanelWidth + 20;
         int viewEndX = this.width - this.rightPanelWidth - 20;
         int viewTopY = HEADER_HEIGHT + 24;
         int viewBottomY = this.height - 10;
-
-        // 2. Calculate Available Space
         int viewHeight = viewBottomY - viewTopY;
         int viewWidth = viewEndX - viewStartX;
 
-        // Sanity check to prevent crashes on very small screens
         if (viewHeight <= 0 || viewWidth <= 0) return;
 
         int centerX = viewStartX + (viewWidth / 2);
         int centerY = viewTopY + (viewHeight / 2);
 
-        // 3. Get Entity Dimensions
         float entityHeight = Math.max(this.cachedEntity.getBbHeight(), 0.1f);
         float entityWidth = Math.max(this.cachedEntity.getBbWidth(), 0.1f);
 
-        // 4. Calculate Dynamic Scale (80% of viewport)
         float verticalScale = (viewHeight * 0.8f) / entityHeight;
         float horizontalScale = (viewWidth * 0.8f) / entityWidth;
         int scale = (int) Math.min(verticalScale, horizontalScale);
-        scale = Math.clamp(scale, 10, 100); // Prevent it from disappearing or becoming pixelatedly massive
+        scale = Math.clamp(scale, 10, 100);
 
-        // 5. Calculate Render Position (The Feet)
         int renderY = centerY + (int) ((entityHeight * scale) / 2.0f);
 
-        // 6. Scissor to prevent overflow
         graphics.enableScissor(viewStartX, viewTopY, viewEndX, viewBottomY);
 
         float eyeOffset = this.cachedEntity.getEyeHeight() * scale;
