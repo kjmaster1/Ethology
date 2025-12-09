@@ -13,6 +13,14 @@ public class EthologyScanner {
 
     // Archetype Scan
     public static void scanEntity(EntityType<?> type) {
+        // Client-Side Cache / Prediction
+        // Check if we already have data for this entity type in the client-side database.
+        // If present, we skip the network request to make the UI feel instant.
+        // The EthologyDatabase is cleared on logout, ensuring this cache is transient.
+        if (EthologyDatabase.get(type) != null) {
+            return;
+        }
+
         // Enforce Server-Side Analysis: Always request data from the server.
         // We no longer perform local analysis on the client thread to avoid incomplete data
         // (Client-side entities often lack full AI goals and Brain memories).
