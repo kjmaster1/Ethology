@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:cactus",
-  "target": "minecraft:avoid",
-  "translation_key": "ethology.trait.activity.minecraft_avoid"
-}

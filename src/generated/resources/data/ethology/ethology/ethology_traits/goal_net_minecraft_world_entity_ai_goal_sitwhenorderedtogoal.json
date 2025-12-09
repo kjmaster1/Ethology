@@ -1,6 +1,0 @@
-{
-  "type": "goal",
-  "icon": "minecraft:lead",
-  "target": "net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal",
-  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_sitwhenorderedtogoal"
-}

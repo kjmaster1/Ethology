@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:turtle_egg",
-  "target": "minecraft:lay_spawn",
-  "translation_key": "ethology.trait.activity.minecraft_lay_spawn"
-}

@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:sculk_shrieker",
-  "target": "minecraft:roar",
-  "translation_key": "ethology.trait.activity.minecraft_roar"
-}

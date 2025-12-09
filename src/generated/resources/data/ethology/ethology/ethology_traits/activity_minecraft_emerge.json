@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:dirt",
-  "target": "minecraft:emerge",
-  "translation_key": "ethology.trait.activity.minecraft_emerge"
-}

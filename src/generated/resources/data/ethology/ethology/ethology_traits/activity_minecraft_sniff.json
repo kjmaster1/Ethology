@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:moss_block",
-  "target": "minecraft:sniff",
-  "translation_key": "ethology.trait.activity.minecraft_sniff"
-}

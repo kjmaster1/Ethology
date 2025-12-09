@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:crafting_table",
-  "target": "minecraft:work",
-  "translation_key": "ethology.trait.activity.minecraft_work"
-}

@@ -1,6 +1,0 @@
-{
-  "type": "sensor",
-  "icon": "minecraft:player_head",
-  "target": "minecraft:nearest_players",
-  "translation_key": "ethology.trait.sensor.minecraft_nearest_players"
-}

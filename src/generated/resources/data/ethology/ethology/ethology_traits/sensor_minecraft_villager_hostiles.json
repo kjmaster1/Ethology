@@ -1,6 +1,0 @@
-{
-  "type": "sensor",
-  "icon": "minecraft:zombie_head",
-  "target": "minecraft:villager_hostiles",
-  "translation_key": "ethology.trait.sensor.minecraft_villager_hostiles"
-}

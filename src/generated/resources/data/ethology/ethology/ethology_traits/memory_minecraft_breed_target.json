@@ -1,6 +1,0 @@
-{
-  "type": "memory",
-  "icon": "minecraft:heart_of_the_sea",
-  "target": "minecraft:breed_target",
-  "translation_key": "ethology.trait.memory.minecraft_breed_target"
-}

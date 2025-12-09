@@ -14,7 +14,5 @@ public class DataGenerators {
     public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
         PackOutput packOutput = generator.getPackOutput();
-
-        generator.addProvider(event.includeServer(), new EthologyTraitProvider(packOutput, event.getLookupProvider()));
     }
 }

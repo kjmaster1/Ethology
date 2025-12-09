@@ -1,6 +1,0 @@
-{
-  "type": "memory",
-  "icon": "minecraft:emerald",
-  "target": "minecraft:job_site",
-  "translation_key": "ethology.trait.memory.minecraft_job_site"
-}

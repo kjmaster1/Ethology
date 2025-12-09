@@ -1,6 +1,0 @@
-{
-  "type": "goal",
-  "icon": "minecraft:bone",
-  "target": "net.minecraft.world.entity.ai.goal.FollowOwnerGoal",
-  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_followownergoal"
-}

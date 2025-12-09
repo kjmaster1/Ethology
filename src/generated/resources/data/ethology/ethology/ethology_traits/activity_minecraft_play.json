@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:poppy",
-  "target": "minecraft:play",
-  "translation_key": "ethology.trait.activity.minecraft_play"
-}

@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:red_bed",
-  "target": "minecraft:rest",
-  "translation_key": "ethology.trait.activity.minecraft_rest"
-}

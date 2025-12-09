@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:spyglass",
-  "target": "minecraft:investigate",
-  "translation_key": "ethology.trait.activity.minecraft_investigate"
-}

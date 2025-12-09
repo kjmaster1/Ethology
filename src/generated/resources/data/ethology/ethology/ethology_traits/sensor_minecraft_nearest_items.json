@@ -1,6 +1,0 @@
-{
-  "type": "sensor",
-  "icon": "minecraft:spyglass",
-  "target": "minecraft:nearest_items",
-  "translation_key": "ethology.trait.sensor.minecraft_nearest_items"
-}

@@ -1,6 +1,0 @@
-{
-  "type": "memory",
-  "icon": "minecraft:diamond_sword",
-  "target": "minecraft:attack_target",
-  "translation_key": "ethology.trait.memory.minecraft_attack_target"
-}

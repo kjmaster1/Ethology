@@ -1,6 +1,0 @@
-{
-  "type": "memory",
-  "icon": "minecraft:bell",
-  "target": "minecraft:meeting_point",
-  "translation_key": "ethology.trait.memory.minecraft_meeting_point"
-}

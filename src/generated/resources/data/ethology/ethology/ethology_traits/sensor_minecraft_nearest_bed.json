@@ -1,6 +1,0 @@
-{
-  "type": "sensor",
-  "icon": "minecraft:red_bed",
-  "target": "minecraft:nearest_bed",
-  "translation_key": "ethology.trait.sensor.minecraft_nearest_bed"
-}

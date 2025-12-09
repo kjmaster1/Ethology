@@ -1,6 +1,0 @@
-{
-  "type": "goal",
-  "icon": "minecraft:grass_block",
-  "target": "net.minecraft.world.entity.ai.goal.EatBlockGoal",
-  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_eatblockgoal"
-}

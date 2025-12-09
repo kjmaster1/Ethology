@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:crossbow",
-  "target": "minecraft:raid",
-  "translation_key": "ethology.trait.activity.minecraft_raid"
-}

@@ -1,6 +1,0 @@
-{
-  "type": "memory",
-  "icon": "minecraft:cookie",
-  "target": "minecraft:liked_player",
-  "translation_key": "ethology.trait.memory.minecraft_liked_player"
-}

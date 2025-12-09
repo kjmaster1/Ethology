@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:goat_horn",
-  "target": "minecraft:ram",
-  "translation_key": "ethology.trait.activity.minecraft_ram"
-}

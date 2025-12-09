@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:sugar",
-  "target": "minecraft:panic",
-  "translation_key": "ethology.trait.activity.minecraft_panic"
-}

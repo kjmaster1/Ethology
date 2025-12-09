@@ -1,6 +1,0 @@
-{
-  "type": "memory",
-  "icon": "minecraft:compass",
-  "target": "minecraft:walk_target",
-  "translation_key": "ethology.trait.memory.minecraft_walk_target"
-}

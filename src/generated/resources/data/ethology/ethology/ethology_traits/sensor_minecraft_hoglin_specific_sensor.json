@@ -1,6 +1,0 @@
-{
-  "type": "sensor",
-  "icon": "minecraft:crimson_fungus",
-  "target": "minecraft:hoglin_specific_sensor",
-  "translation_key": "ethology.trait.sensor.minecraft_hoglin_specific_sensor"
-}

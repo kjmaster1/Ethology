@@ -1,6 +1,0 @@
-{
-  "type": "goal",
-  "icon": "minecraft:bow",
-  "target": "net.minecraft.world.entity.ai.goal.RangedBowAttackGoal",
-  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_rangedbowattackgoal"
-}

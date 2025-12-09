@@ -48,17 +48,17 @@ public class GoalParser {
         Goal innerGoal = unwrap(inputGoal);
 
         // A. Static JSON Lookup
-        Optional<MobTrait> traitOpt = Ethology.TRAIT_MANAGER.getTrait(innerGoal.getClass());
-        if (traitOpt.isPresent()) {
-            consumer.accept(traitOpt.get());
-        } else if (Config.DEBUG_MODE.get()) {
-            consumer.accept(new MobTrait(
-                    ResourceLocation.parse("ethology:debug_" + innerGoal.getClass().getSimpleName().toLowerCase()),
-                    new ItemStack(Items.BARRIER),
-                    "ethology.trait.goal.unknown",
-                    TraitType.GOAL
-            ));
-        }
+//        Optional<MobTrait> traitOpt = Ethology.TRAIT_MANAGER.getTrait(innerGoal.getClass());
+//        if (traitOpt.isPresent()) {
+//            consumer.accept(traitOpt.get());
+//        } else if (Config.DEBUG_MODE.get()) {
+//            consumer.accept(new MobTrait(
+//                    ResourceLocation.parse("ethology:debug_" + innerGoal.getClass().getSimpleName().toLowerCase()),
+//                    new ItemStack(Items.BARRIER),
+//                    "ethology.trait.goal.unknown",
+//                    TraitType.GOAL
+//            ));
+//        }
 
         // B. Dynamic Analysis
         GoalParserRegistry.getParser(innerGoal).ifPresent(parser ->

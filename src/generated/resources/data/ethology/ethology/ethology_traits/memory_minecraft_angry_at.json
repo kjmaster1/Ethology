@@ -1,6 +1,0 @@
-{
-  "type": "memory",
-  "icon": "minecraft:blaze_powder",
-  "target": "minecraft:angry_at",
-  "translation_key": "ethology.trait.memory.minecraft_angry_at"
-}

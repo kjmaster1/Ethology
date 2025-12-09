@@ -1,6 +1,0 @@
-{
-  "type": "sensor",
-  "icon": "minecraft:iron_block",
-  "target": "minecraft:golem_detected",
-  "translation_key": "ethology.trait.sensor.minecraft_golem_detected"
-}

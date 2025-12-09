@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:firework_rocket",
-  "target": "minecraft:celebrate",
-  "translation_key": "ethology.trait.activity.minecraft_celebrate"
-}

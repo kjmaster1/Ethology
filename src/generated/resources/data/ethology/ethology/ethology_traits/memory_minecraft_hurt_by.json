@@ -1,6 +1,0 @@
-{
-  "type": "memory",
-  "icon": "minecraft:damaged_anvil",
-  "target": "minecraft:hurt_by",
-  "translation_key": "ethology.trait.memory.minecraft_hurt_by"
-}

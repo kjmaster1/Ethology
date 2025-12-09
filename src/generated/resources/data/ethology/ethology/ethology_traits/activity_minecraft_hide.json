@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:shield",
-  "target": "minecraft:hide",
-  "translation_key": "ethology.trait.activity.minecraft_hide"
-}

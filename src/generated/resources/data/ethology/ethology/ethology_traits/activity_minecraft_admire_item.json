@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:gold_ingot",
-  "target": "minecraft:admire_item",
-  "translation_key": "ethology.trait.activity.minecraft_admire_item"
-}

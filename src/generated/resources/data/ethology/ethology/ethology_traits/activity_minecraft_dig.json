@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:iron_shovel",
-  "target": "minecraft:dig",
-  "translation_key": "ethology.trait.activity.minecraft_dig"
-}

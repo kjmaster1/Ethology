@@ -1,6 +1,0 @@
-{
-  "type": "memory",
-  "icon": "minecraft:red_bed",
-  "target": "minecraft:home",
-  "translation_key": "ethology.trait.memory.minecraft_home"
-}

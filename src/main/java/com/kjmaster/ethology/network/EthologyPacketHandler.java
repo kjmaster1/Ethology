@@ -34,6 +34,7 @@ public class EthologyPacketHandler {
                 RequestScanPayload.STREAM_CODEC,
                 (payload, context) -> {
                     if (context.player() instanceof ServerPlayer serverPlayer) {
+                        // Enforce execution on the Main Server Thread
                         context.enqueueWork(() -> handleScanRequest(serverPlayer, payload));
                     }
                 }
@@ -80,13 +81,35 @@ public class EthologyPacketHandler {
             return;
         }
 
-        // If not in cache, perform analysis
+        // If not in cache, perform analysis on the Server Level
         try {
-            // This is the expensive operation we are trying to minimize
-            MobScopedInfo info = EntityAnalyzer.analyze(type, player.serverLevel());
-            if (info != null) {
-                ARCHETYPE_CACHE.put(type, info); // Store result in cache
-                player.connection.send(new SyncMobDataPayload(info));
+            // Instantiate the entity on the server
+            Entity entity = type.create(player.serverLevel());
+
+            if (entity instanceof LivingEntity living) {
+                // Safety Tick: Force AI initialization
+                // Many mobs (especially Brain-based ones) only populate their tasks/goals during their first tick.
+                try {
+                    living.tick();
+                } catch (Exception ignored) {
+                    // Swallow exceptions during safety tick (e.g. issues with void pathfinding)
+                }
+
+                // Analyze
+                // We use the instance analyzer to capture the state populated by the tick
+                MobScopedInfo info = EntityAnalyzer.analyze(living);
+
+                // Sanitize for Archetype usage:
+                // Remove the UUID so the client treats this as generic static data rather than a specific mob.
+                if (info != null) {
+                    info.setUuid(null);
+
+                    ARCHETYPE_CACHE.put(type, info); // Store result in cache
+                    player.connection.send(new SyncMobDataPayload(info));
+                }
+
+                // Cleanup
+                living.discard();
             }
         } catch (Exception e) {
             Ethology.LOGGER.warn("Failed to analyze entity archetype: {}", payload.typeId(), e);

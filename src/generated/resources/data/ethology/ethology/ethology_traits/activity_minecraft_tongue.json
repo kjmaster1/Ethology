@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:slime_ball",
-  "target": "minecraft:tongue",
-  "translation_key": "ethology.trait.activity.minecraft_tongue"
-}

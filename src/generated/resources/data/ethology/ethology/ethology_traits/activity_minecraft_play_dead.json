@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:bone",
-  "target": "minecraft:play_dead",
-  "translation_key": "ethology.trait.activity.minecraft_play_dead"
-}

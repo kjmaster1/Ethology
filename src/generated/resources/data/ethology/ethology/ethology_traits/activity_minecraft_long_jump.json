@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:rabbit_foot",
-  "target": "minecraft:long_jump",
-  "translation_key": "ethology.trait.activity.minecraft_long_jump"
-}

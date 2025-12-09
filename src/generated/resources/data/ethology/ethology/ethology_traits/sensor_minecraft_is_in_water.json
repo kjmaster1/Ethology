@@ -1,6 +1,0 @@
-{
-  "type": "sensor",
-  "icon": "minecraft:water_bucket",
-  "target": "minecraft:is_in_water",
-  "translation_key": "ethology.trait.sensor.minecraft_is_in_water"
-}

@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:netherite_sword",
-  "target": "minecraft:fight",
-  "translation_key": "ethology.trait.activity.minecraft_fight"
-}

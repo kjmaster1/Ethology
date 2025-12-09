@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:saddle",
-  "target": "minecraft:ride",
-  "translation_key": "ethology.trait.activity.minecraft_ride"
-}

@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:ominous_bottle",
-  "target": "minecraft:pre_raid",
-  "translation_key": "ethology.trait.activity.minecraft_pre_raid"
-}

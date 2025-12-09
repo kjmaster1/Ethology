@@ -1,6 +1,0 @@
-{
-  "type": "goal",
-  "icon": "minecraft:egg",
-  "target": "net.minecraft.world.entity.ai.goal.BreedGoal",
-  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_breedgoal"
-}

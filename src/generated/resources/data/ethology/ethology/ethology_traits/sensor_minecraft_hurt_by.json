@@ -1,6 +1,0 @@
-{
-  "type": "sensor",
-  "icon": "minecraft:iron_axe",
-  "target": "minecraft:hurt_by",
-  "translation_key": "ethology.trait.sensor.minecraft_hurt_by"
-}

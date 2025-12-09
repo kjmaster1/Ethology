@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:bell",
-  "target": "minecraft:meet",
-  "translation_key": "ethology.trait.activity.minecraft_meet"
-}

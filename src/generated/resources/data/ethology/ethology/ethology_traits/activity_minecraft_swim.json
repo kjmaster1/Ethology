@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:water_bucket",
-  "target": "minecraft:swim",
-  "translation_key": "ethology.trait.activity.minecraft_swim"
-}

@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:clock",
-  "target": "minecraft:idle",
-  "translation_key": "ethology.trait.activity.minecraft_idle"
-}

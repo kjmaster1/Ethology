@@ -1,6 +1,0 @@
-{
-  "type": "goal",
-  "icon": "minecraft:rotten_flesh",
-  "target": "net.minecraft.world.entity.ai.goal.FleeSunGoal",
-  "translation_key": "ethology.trait.goal.net_minecraft_world_entity_ai_goal_fleesungoal"
-}

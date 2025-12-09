@@ -17,21 +17,21 @@ public class BrainParser {
         Brain<?> brain = entity.getBrain();
 
         // 1. Sensors
-        for (SensorType<?> sensorType : brain.sensors.keySet()) {
-            Ethology.TRAIT_MANAGER.getTrait(sensorType).ifPresent(info::addCapability);
-        }
-
-        // 2. Memories (Potential)
-        for (MemoryModuleType<?> type : brain.memories.keySet()) {
-            Ethology.TRAIT_MANAGER.getTrait(type).ifPresent(info::addCapability);
-        }
-
-        // 3. Activities (Potential Behaviors)
-        for (Map<Activity, ?> innerMap : brain.availableBehaviorsByPriority.values()) {
-            for (Activity activity : innerMap.keySet()) {
-                Ethology.TRAIT_MANAGER.getTrait(activity).ifPresent(info::addCapability);
-            }
-        }
+//        for (SensorType<?> sensorType : brain.sensors.keySet()) {
+//            Ethology.TRAIT_MANAGER.getTrait(sensorType).ifPresent(info::addCapability);
+//        }
+//
+//        // 2. Memories (Potential)
+//        for (MemoryModuleType<?> type : brain.memories.keySet()) {
+//            Ethology.TRAIT_MANAGER.getTrait(type).ifPresent(info::addCapability);
+//        }
+//
+//        // 3. Activities (Potential Behaviors)
+//        for (Map<Activity, ?> innerMap : brain.availableBehaviorsByPriority.values()) {
+//            for (Activity activity : innerMap.keySet()) {
+//                Ethology.TRAIT_MANAGER.getTrait(activity).ifPresent(info::addCapability);
+//            }
+//        }
     }
 
     // Helper: Dynamic State
@@ -40,8 +40,8 @@ public class BrainParser {
 
         // Active Activities
         // In 1.21, activeActivities is the set of currently running activities
-        for (Activity activity : brain.activeActivities) {
-            Ethology.TRAIT_MANAGER.getTrait(activity).ifPresent(info::addCurrentState);
-        }
+//        for (Activity activity : brain.activeActivities) {
+//            Ethology.TRAIT_MANAGER.getTrait(activity).ifPresent(info::addCurrentState);
+//        }
     }
 }

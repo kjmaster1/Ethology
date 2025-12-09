@@ -1,6 +1,0 @@
-{
-  "type": "activity",
-  "icon": "minecraft:heart_of_the_sea",
-  "target": "minecraft:core",
-  "translation_key": "ethology.trait.activity.minecraft_core"
-}
